@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>PICCELL</title>
+<style>
+:root {
+	--paper: #f6f5f2;
+	--panel: #ffffff;
+	--line: #e3e0da;
+	--ink: #23211e;
+	--soft: #6f6a62;
+	--accent: #1f7a4d;
+	--accent-ink: #ffffff;
+	--warn: #fff1c7;
+	--warn-line: #e8c55a;
+	--pick: #e3f1e9;
+	--danger: #b3261e;
+	--radius: 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--paper: #1b1a18;
+		--panel: #252421;
+		--line: #3a3833;
+		--ink: #ece9e3;
+		--soft: #a39d93;
+		--accent: #3fae78;
+		--accent-ink: #0f1a14;
+		--warn: #4a3d12;
+		--warn-line: #9c7f22;
+		--pick: #23402f;
+	}
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+	margin: 0;
+	height: 100%;
+	background: var(--paper);
+	color: var(--ink);
+	font: 14px/1.4 "Segoe UI", system-ui, sans-serif;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+#app {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+header {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 12px 18px;
+	border-bottom: 1px solid var(--line);
+	background: var(--panel);
+}
+
+header h1 {
+	margin: 0;
+	font-size: 18px;
+	letter-spacing: 3px;
+	font-weight: 700;
+}
+
+header h1 small {
+	margin-left: 8px;
+	font-size: 11px;
+	letter-spacing: 0;
+	font-weight: 400;
+	color: var(--soft);
+}
+
+header .grow { flex: 1; }
+
+#news {
+	display: none;
+	align-items: center;
+	gap: 10px;
+	padding: 4px 4px 4px 12px;
+	border: 1px solid var(--accent);
+	border-radius: 8px;
+	font-size: 13px;
+}
+
+#news.on { display: flex; }
+#news button { padding: 4px 10px; }
+
+.segment {
+	display: inline-flex;
+	border: 1px solid var(--line);
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.segment button {
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	padding: 6px 12px;
+	color: var(--soft);
+}
+
+.segment button + button { border-left: 1px solid var(--line); }
+
+.segment button.on {
+	background: var(--accent);
+	color: var(--accent-ink);
+}
+
+button {
+	font: inherit;
+	color: var(--ink);
+	background: var(--panel);
+	border: 1px solid var(--line);
+	border-radius: 8px;
+	padding: 7px 14px;
+	cursor: pointer;
+}
+
+button:hover:not(:disabled) { border-color: var(--soft); }
+button:disabled { opacity: 0.45; cursor: default; }
+
+button.main {
+	background: var(--accent);
+	border-color: var(--accent);
+	color: var(--accent-ink);
+	font-weight: 600;
+}
+
+main {
+	flex: 1;
+	display: flex;
+	min-height: 0;
+}
+
+#left {
+	width: 38%;
+	min-width: 280px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 16px;
+	border-right: 1px solid var(--line);
+}
+
+#drop {
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 2px dashed var(--line);
+	border-radius: var(--radius);
+	background: var(--panel);
+	overflow: hidden;
+	position: relative;
+}
+
+#drop.over { border-color: var(--accent); }
+
+#drop img {
+	max-width: 100%;
+	max-height: 100%;
+	display: none;
+}
+
+#drop.full img { display: block; cursor: crosshair; }
+#drop.full #hint { display: none; }
+
+/* THE BOX DRAWN OVER THE PHOTO: THE REST OF THE PHOTO GOES DARK */
+#sel {
+	position: absolute;
+	display: none;
+	border: 2px solid var(--accent);
+	box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.4);
+	pointer-events: none;
+}
+
+#sel.on { display: block; }
+
+#cropBar {
+	position: absolute;
+	display: none;
+	gap: 6px;
+}
+
+#cropBar.on { display: flex; }
+#cropBar button { padding: 4px 10px; }
+
+#whole {
+	position: absolute;
+	left: 10px;
+	top: 10px;
+	display: none;
+	padding: 4px 10px;
+}
+
+#whole.on { display: block; }
+
+#hint {
+	text-align: center;
+	color: var(--soft);
+	padding: 20px;
+}
+
+#hint b {
+	display: block;
+	font-size: 16px;
+	color: var(--ink);
+	margin-bottom: 6px;
+}
+
+.row {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.row .grow { flex: 1; }
+
+#right {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	padding: 16px;
+	gap: 10px;
+}
+
+#sheet {
+	flex: 1;
+	min-height: 0;
+	overflow: auto;
+	background: var(--panel);
+	border: 1px solid var(--line);
+	border-radius: var(--radius);
+}
+
+#empty {
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--soft);
+	text-align: center;
+	padding: 20px;
+}
+
+table {
+	border-collapse: collapse;
+	font-variant-numeric: tabular-nums;
+}
+
+th, td {
+	border: 1px solid var(--line);
+	padding: 0;
+	min-width: 70px;
+	height: 28px;
+}
+
+th {
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	background: var(--paper);
+	color: var(--soft);
+	font-weight: 500;
+	font-size: 12px;
+	padding: 2px 8px;
+}
+
+th.num {
+	position: sticky;
+	left: 0;
+	min-width: 36px;
+	z-index: 2;
+}
+
+td.num {
+	position: sticky;
+	left: 0;
+	background: var(--paper);
+	color: var(--soft);
+	font-size: 12px;
+	text-align: center;
+	min-width: 36px;
+}
+
+td div {
+	padding: 4px 8px;
+	outline: none;
+	white-space: pre;
+	min-height: 27px;
+	-webkit-user-select: text;
+	user-select: text;
+}
+
+td div:focus {
+	background: var(--pick);
+	box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+td.check div { background: var(--warn); }
+
+td.n div { text-align: right; }
+
+tr.title td div { font-weight: 600; }
+
+#status {
+	padding: 7px 18px;
+	border-top: 1px solid var(--line);
+	color: var(--soft);
+	background: var(--panel);
+	min-height: 34px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+#status.bad { color: var(--danger); }
+
+#status a {
+	color: var(--accent);
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.spin {
+	width: 14px;
+	height: 14px;
+	border: 2px solid var(--line);
+	border-top-color: var(--accent);
+	border-radius: 50%;
+	display: none;
+	animation: turn 0.8s linear infinite;
+}
+
+.busy .spin { display: inline-block; }
+
+@keyframes turn { to { transform: rotate(360deg); } }
+
+.legend {
+	color: var(--soft);
+	font-size: 12px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.legend i {
+	display: inline-block;
+	width: 12px;
+	height: 12px;
+	border-radius: 3px;
+	background: var(--warn);
+	border: 1px solid var(--warn-line);
+}
+</style>
+</head>
+<body>
+<div id="app">
+	<header>
+		<h1>PICCELL<small id="version"></small></h1>
+		<div class="segment" id="mode">
+			<button data-mode="auto" class="on" data-t="auto"></button>
+			<button data-mode="print" data-t="print"></button>
+			<button data-mode="hand" data-t="hand"></button>
+		</div>
+		<div class="grow"></div>
+		<div id="news"><span id="newsText"></span><button id="restart" data-t="restart"></button></div>
+		<div class="segment" id="lang">
+			<button data-lang="tr">TR</button>
+			<button data-lang="en">EN</button>
+		</div>
+	</header>
+	<main>
+		<section id="left">
+			<div id="drop">
+				<img id="photo" alt="" draggable="false">
+				<div id="sel"></div>
+				<div id="cropBar"><button id="crop" class="main" data-t="crop"></button><button id="noSel" data-t="noSel"></button></div>
+				<button id="whole" data-t="whole"></button>
+				<div id="hint"><b data-t="dropTitle"></b><span data-t="dropText"></span></div>
+			</div>
+			<div class="row">
+				<button id="open" data-t="open"></button>
+				<button id="paste" data-t="paste"></button>
+				<div class="grow"></div>
+				<button id="readAdd" data-t="readAdd" data-tip="readAddTip" disabled></button>
+				<button id="read" class="main" data-t="read" disabled></button>
+			</div>
+		</section>
+		<section id="right">
+			<div class="row">
+				<button id="addRow" data-t="addRow" disabled></button>
+				<button id="addCol" data-t="addCol" disabled></button>
+				<button id="delRow" data-t="delRow" disabled></button>
+				<button id="delCol" data-t="delCol" disabled></button>
+				<div class="grow"></div>
+				<span class="legend" id="legend" style="display:none"><i></i><span data-t="check"></span></span>
+			</div>
+			<div id="sheet"><div id="empty" data-t="empty"></div></div>
+			<div class="row">
+				<button id="xlsx" class="main" data-t="xlsx" disabled></button>
+				<button id="csv" data-t="csv" disabled></button>
+				<button id="pdf" data-t="pdf" disabled></button>
+				<div class="grow"></div>
+				<button id="copy" data-t="copy" disabled></button>
+			</div>
+		</section>
+	</main>
+	<div id="status"><span class="spin"></span><span id="say"></span></div>
+</div>
+<script>
+var TEXT = {
+	tr: {
+		auto: "Otomatik", print: "Basılı", hand: "El yazısı",
+		dropTitle: "Fotoğrafı buraya bırakın",
+		dropText: "ya da açın, ya da Ctrl+V ile yapıştırın",
+		open: "Fotoğraf aç", paste: "Yapıştır", read: "Oku",
+		readAdd: "+ Sayfa",
+		readAddTip: "Bu fotoğrafı okuyup satırlarını tablonun altına ekle (listenin sonraki sayfası)",
+		addRow: "+ Satır", addCol: "+ Sütun",
+		delRow: "Satırı sil", delCol: "Sütunu sil",
+		empty: "Okunan tablo burada görünür. Hücreleri düzeltebilirsiniz.",
+		xlsx: "Excel olarak kaydet", csv: "CSV", pdf: "PDF",
+		copy: "Kopyala (Excel'e yapıştırın)",
+		check: "Kontrol edin",
+		ready: "Hazır.", loading: "Fotoğraf yükleniyor...",
+		loaded: "Fotoğraf hazır: {w} × {h}. Şimdi Oku'ya basın. Yalnızca bir kısmı için fotoğrafın üzerinde sürükleyin.",
+		crop: "Kırp", noSel: "Vazgeç", whole: "Tüm fotoğraf",
+		selected: "Yalnızca seçilen kısım okunur. Kırp'a ya da doğrudan Oku'ya basın.",
+		cropped: "Kırpıldı: {w} × {h}. Şimdi Oku'ya basın.",
+		reading: "Okunuyor...",
+		readDone: "{r} satır, {c} sütun okundu ({how}).",
+		addDone: "{n} satır eklendi, tabloda {r} satır var ({how}).",
+		howPrint: "basılı yazı", howHand: "el yazısı",
+		checkSome: " Sarı hücreleri kontrol edin.",
+		saved: "Kaydedildi: {p}", openIt: "Aç",
+		copied: "Kopyalandı. Excel'de bir hücreye tıklayıp Ctrl+V yapın.",
+		e2: "Bu dosya bir resim değil ya da açılamıyor.",
+		e3: "Panoda resim yok.",
+		e4: "Windows OCR bulunamadı (Windows 10 ya da 11 gerekir). El yazısı seçeneğini deneyin.",
+		e5: "Resimde yazı bulunamadı.",
+		e6: "Dosya yazılamadı (başka bir programda açık mı?).",
+		e7: "El yazısı okuyucusu bu PICCELL.exe'de yok.",
+		e0: "Bir sorun çıktı.",
+		news: "PICCELL {v} hazır: bu pencere kapanınca yerine konur.",
+		restart: "Şimdi yeniden başlat",
+		restartSure: "Tablo kaybolacak. Yine de başlat"
+	},
+	en: {
+		auto: "Automatic", print: "Printed", hand: "Handwritten",
+		dropTitle: "Drop the photo here",
+		dropText: "or open it, or paste it with Ctrl+V",
+		open: "Open photo", paste: "Paste", read: "Read",
+		readAdd: "+ Page",
+		readAddTip: "Read this photo and add its rows under the table (the next page of a list)",
+		addRow: "+ Row", addCol: "+ Column",
+		delRow: "Delete row", delCol: "Delete column",
+		empty: "The table shows up here. You can fix any cell.",
+		xlsx: "Save as Excel", csv: "CSV", pdf: "PDF",
+		copy: "Copy (paste into Excel)",
+		check: "Check these",
+		ready: "Ready.", loading: "Loading the photo...",
+		loaded: "Photo ready: {w} × {h}. Now press Read. To read only part of it, drag over the photo.",
+		crop: "Crop", noSel: "Cancel", whole: "Whole photo",
+		selected: "Only the selected part is read. Press Crop, or just Read.",
+		cropped: "Cropped: {w} × {h}. Now press Read.",
+		reading: "Reading...",
+		readDone: "{r} rows and {c} columns read ({how}).",
+		addDone: "{n} rows added, the table has {r} rows ({how}).",
+		howPrint: "printed", howHand: "handwriting",
+		checkSome: " Check the yellow cells.",
+		saved: "Saved: {p}", openIt: "Open",
+		copied: "Copied. Click a cell in Excel and press Ctrl+V.",
+		e2: "This file is not a picture, or it can not be opened.",
+		e3: "There is no picture on the clipboard.",
+		e4: "No Windows OCR here (Windows 10 or 11 needed). Try Handwritten.",
+		e5: "No text was found in the picture.",
+		e6: "The file could not be written (is it open in another program?).",
+		e7: "This PICCELL.exe has no handwriting reader.",
+		e0: "Something went wrong.",
+		news: "PICCELL {v} is ready: it goes in place when this window closes.",
+		restart: "Restart now",
+		restartSure: "The table will be lost. Restart anyway"
+	}
+};
+
+var lang = "tr";
+var mode = "auto";
+var rows = [];
+var checks = [];
+var picked = null;
+var toLearn = [];
+var hasPhoto = false;
+var busy = false;
+var newTag = "";
+var sure = false;
+var sel = null; /* THE BOX OVER THE PHOTO: x0, y0, x1, y1 FROM 0 TO 1 */
+var dragFrom = null;
+var cropped = false;
+
+function $(id) { return document.getElementById(id); }
+
+function t(key, values) {
+	var s = (TEXT[lang] && TEXT[lang][key]) || TEXT.en[key] || key;
+
+	if (values)
+		for (var k in values)
+			s = s.split("{" + k + "}").join(values[k]);
+
+	return s;
+}
+
+function paint() {
+	var all = document.querySelectorAll("[data-t]");
+
+	for (var i = 0; i < all.length; ++i)
+		all[i].textContent = t(all[i].getAttribute("data-t"));
+
+	var tips = document.querySelectorAll("[data-tip]");
+
+	for (var k = 0; k < tips.length; ++k)
+		tips[k].title = t(tips[k].getAttribute("data-tip"));
+
+	var langs = $("lang").querySelectorAll("button");
+
+	for (var j = 0; j < langs.length; ++j)
+		langs[j].className = langs[j].getAttribute("data-lang") == lang ? "on" : "";
+
+	if (newTag)
+		$("newsText").textContent = t("news", { v: newTag });
+
+	if (sure)
+		$("restart").textContent = t("restartSure");
+}
+
+function say(text, bad, link) {
+	var box = $("say");
+
+	box.textContent = text;
+	$("status").className = bad ? "bad" : "";
+
+	if (link) {
+		var a = document.createElement("a");
+
+		a.textContent = t("openIt");
+		a.onclick = function () { piccell.show(link); };
+		box.appendChild(document.createTextNode(" "));
+		box.appendChild(a);
+	}
+}
+
+function problem(code) {
+	return t("e" + code) == "e" + code ? t("e0") : t("e" + code);
+}
+
+function setBusy(on) {
+	busy = on;
+	$("app").className = on ? "busy" : "";
+	$("status").className = on ? "busy" : "";
+	update();
+}
+
+function update() {
+	var full = rows.length > 0;
+
+	$("read").disabled = busy || !hasPhoto;
+	$("readAdd").disabled = busy || !hasPhoto || !full;
+	$("open").disabled = busy;
+	$("paste").disabled = busy;
+	$("crop").disabled = busy;
+	$("whole").disabled = busy;
+
+	var ids = ["xlsx", "csv", "pdf", "copy", "addRow", "addCol"];
+
+	for (var i = 0; i < ids.length; ++i)
+		$(ids[i]).disabled = busy || !full;
+
+	$("delRow").disabled = busy || !full || !picked;
+	$("delCol").disabled = busy || !full || !picked;
+}
+
+/* ---------------------------------------------------------------- THE PHOTO */
+/* CROP: 1 = A CROP OF THE PHOTO, 0 = THE WHOLE PHOTO OR A NEW ONE */
+function showPhoto(answer, crop) {
+	if (!answer || answer.code) {
+		say(problem(answer ? answer.code : 0), true);
+		return;
+	}
+
+	setSelection(null);
+	cropped = !!crop;
+	$("photo").src = answer.preview;
+	$("drop").className = "full";
+	$("whole").className = cropped ? "on" : "";
+	hasPhoto = true;
+	say(t(cropped ? "cropped" : "loaded", { w: answer.w, h: answer.h }));
+	update();
+}
+
+function afterLoad(promise) {
+	setBusy(true);
+	say(t("loading"));
+	promise.then(function (answer) {
+		setBusy(false);
+		showPhoto(answer);
+	}, function () {
+		setBusy(false);
+		say(t("e0"), true);
+	});
+}
+
+function sendFile(file) {
+	var reader = new FileReader();
+
+	reader.onload = function () {
+		var url = String(reader.result);
+
+		afterLoad(piccell.drop(url.substring(url.indexOf(",") + 1)));
+	};
+	reader.readAsDataURL(file);
+}
+
+$("open").onclick = function () {
+	piccell.open().then(function (answer) {
+		if (answer && answer.cancel)
+			return;
+
+		showPhoto(answer);
+	});
+};
+
+$("paste").onclick = function () { afterLoad(piccell.paste()); };
+
+document.addEventListener("paste", function (e) {
+	var items = (e.clipboardData && e.clipboardData.items) || [];
+
+	if (busy || (document.activeElement && document.activeElement.isContentEditable))
+		return;
+
+	for (var i = 0; i < items.length; ++i) {
+		if (items[i].type.indexOf("image/") == 0) {
+			e.preventDefault();
+			sendFile(items[i].getAsFile());
+			return;
+		}
+	}
+
+	e.preventDefault();
+	afterLoad(piccell.paste());
+});
+
+var drop = $("drop");
+
+drop.addEventListener("dragover", function (e) {
+	e.preventDefault();
+	drop.classList.add("over");
+});
+
+drop.addEventListener("dragleave", function () { drop.classList.remove("over"); });
+
+drop.addEventListener("drop", function (e) {
+	e.preventDefault();
+	drop.classList.remove("over");
+
+	if (!busy && e.dataTransfer.files && e.dataTransfer.files.length)
+		sendFile(e.dataTransfer.files[0]);
+});
+
+document.addEventListener("dragover", function (e) { e.preventDefault(); });
+document.addEventListener("drop", function (e) { e.preventDefault(); });
+
+/* ---------------------------------------------------------------- READING */
+/* THE SAME TEXT, CASE AND SPACES LEFT OUT (A HEADER REPEATED ON A PAGE) */
+function sameRow(a, b) {
+	if (!a || !b)
+		return false;
+
+	var x = a.join("|").toLowerCase().replace(/\s+/g, "");
+	var y = b.join("|").toLowerCase().replace(/\s+/g, "");
+	return x.length > 0 && x == y;
+}
+
+/*
+ * READ THE PHOTO. ADD: ITS ROWS GO UNDER THE TABLE THAT IS THERE (THE NEXT
+ * PAGE OF A LIST); A HEADER THAT REPEATS THE FIRST ROW IS LEFT OUT.
+ */
+function readPhoto(add) {
+	if (sel) {
+		applyCrop(function () { readPhoto(add); });
+		return;
+	}
+
+	setBusy(true);
+	say(t("reading"));
+	piccell.read(mode).then(function (answer) {
+		setBusy(false);
+
+		if (answer.code) {
+			say(problem(answer.code), true);
+			return;
+		}
+
+		var newRows = answer.rows;
+		var newChecks = answer.check || [];
+		var added = newRows.length;
+
+		if (add) {
+			if (rows.length && newRows.length && sameRow(rows[0], newRows[0])) {
+				newRows = newRows.slice(1);
+				newChecks = newChecks.slice(1);
+				added = newRows.length;
+			}
+
+			while (checks.length < rows.length)
+				checks.push([]);
+
+			rows = rows.concat(newRows);
+			checks = checks.concat(newChecks);
+		} else {
+			rows = newRows;
+			checks = newChecks;
+			toLearn = [];
+		}
+
+		draw();
+
+		var anyCheck = false;
+
+		for (var i = 0; i < checks.length; ++i)
+			if (checks[i] && checks[i].indexOf(1) >= 0)
+				anyCheck = true;
+
+		$("legend").style.display = anyCheck ? "" : "none";
+
+		var how = answer.used == "hand" ? t("howHand") : t("howPrint");
+		var text;
+
+		if (add)
+			text = t("addDone", { n: added, r: rows.length, how: how });
+		else
+			text = t("readDone", { r: rows.length, c: width(), how: how });
+
+		say(text + (anyCheck ? t("checkSome") : ""));
+	}, function () {
+		setBusy(false);
+		say(t("e0"), true);
+	});
+}
+
+$("read").onclick = function () { readPhoto(false); };
+$("readAdd").onclick = function () { readPhoto(true); };
+
+/* ---------------------------------------------------------------- THE TABLE */
+function width() {
+	var n = 0;
+
+	for (var i = 0; i < rows.length; ++i)
+		n = Math.max(n, rows[i].length);
+
+	return n;
+}
+
+function columnName(c) {
+	var s = "";
+
+	for (c += 1; c > 0; c = Math.floor((c - 1) / 26))
+		s = String.fromCharCode(65 + (c - 1) % 26) + s;
+
+	return s;
+}
+
+/* NUMBERS STAND ON THE RIGHT, AS IN EXCEL: "1.234,56", "12", "15%" */
+function isNumber(text) {
+	return /^[-+]?[0-9][0-9.,]*%?$/.test(text || "");
+}
+
+function draw() {
+	var sheet = $("sheet");
+	var cols = width();
+	var html = ["<table><tr><th class='num'></th>"];
+
+	for (var c = 0; c < cols; ++c)
+		html.push("<th>" + columnName(c) + "</th>");
+
+	html.push("</tr>");
+
+	for (var r = 0; r < rows.length; ++r) {
+		html.push("<tr><td class='num'>" + (r + 1) + "</td>");
+
+		for (var k = 0; k < cols; ++k) {
+			var kinds = [];
+
+			if (checks[r] && checks[r][k])
+				kinds.push("check");
+
+			if (isNumber(rows[r][k]))
+				kinds.push("n");
+
+			html.push("<td class='" + kinds.join(" ") + "'><div contenteditable='true' data-r='" +
+				r + "' data-c='" + k + "'></div></td>");
+		}
+
+		html.push("</tr>");
+	}
+
+	html.push("</table>");
+	sheet.innerHTML = html.join("");
+
+	var cells = sheet.querySelectorAll("td div");
+
+	for (var i = 0; i < cells.length; ++i) {
+		var cell = cells[i];
+		var rr = +cell.getAttribute("data-r");
+		var cc = +cell.getAttribute("data-c");
+
+		cell.textContent = rows[rr][cc] || "";
+		cell.onfocus = onPick;
+		cell.oninput = onEdit;
+		cell.onkeydown = onKey;
+		cell.onblur = onLeave;
+	}
+
+	picked = null;
+	update();
+
+	if (!rows.length)
+		sheet.innerHTML = "<div id='empty'>" + t("empty") + "</div>";
+}
+
+function onPick() {
+	picked = { r: +this.getAttribute("data-r"), c: +this.getAttribute("data-c") };
+	update();
+}
+
+function onEdit() {
+	var r = +this.getAttribute("data-r");
+	var c = +this.getAttribute("data-c");
+
+	while (rows[r].length <= c)
+		rows[r].push("");
+
+	rows[r][c] = this.textContent.replace(/\n/g, " ");
+	this.setAttribute("data-e", "1");
+
+	if (checks[r] && checks[r][c])
+		checks[r][c] = 0;
+
+	this.parentNode.className = isNumber(rows[r][c]) ? "n" : "";
+}
+
+/* A FIXED CELL, WHEN THE USER IS DONE WITH IT, IS REMEMBERED FOR LEARNING */
+function onLeave() {
+	if (!this.getAttribute("data-e"))
+		return;
+
+	this.removeAttribute("data-e");
+	toLearn.push(this.textContent.replace(/\n/g, " "));
+}
+
+function focusCell(r, c) {
+	var cell = $("sheet").querySelector("div[data-r='" + r + "'][data-c='" + c + "']");
+
+	if (!cell)
+		return;
+
+	cell.focus();
+
+	var range = document.createRange();
+
+	range.selectNodeContents(cell);
+	window.getSelection().removeAllRanges();
+	window.getSelection().addRange(range);
+}
+
+function onKey(e) {
+	var r = +this.getAttribute("data-r");
+	var c = +this.getAttribute("data-c");
+
+	if (e.key == "Enter") {
+		e.preventDefault();
+		focusCell(e.shiftKey ? r - 1 : r + 1, c);
+	} else if (e.key == "ArrowDown") {
+		e.preventDefault();
+		focusCell(r + 1, c);
+	} else if (e.key == "ArrowUp") {
+		e.preventDefault();
+		focusCell(r - 1, c);
+	} else if (e.key == "Escape") {
+		this.blur();
+	}
+}
+
+function fill() {
+	var cols = width();
+
+	for (var r = 0; r < rows.length; ++r)
+		while (rows[r].length < cols)
+			rows[r].push("");
+}
+
+$("addRow").onclick = function () {
+	var at = picked ? picked.r + 1 : rows.length;
+	var row = [];
+
+	for (var c = 0; c < width(); ++c)
+		row.push("");
+
+	rows.splice(at, 0, row);
+	checks.splice(at, 0, []);
+	draw();
+	focusCell(at, 0);
+};
+
+$("addCol").onclick = function () {
+	var at = picked ? picked.c + 1 : width();
+
+	fill();
+
+	for (var r = 0; r < rows.length; ++r) {
+		rows[r].splice(at, 0, "");
+
+		if (checks[r])
+			checks[r].splice(at, 0, 0);
+	}
+
+	draw();
+	focusCell(0, at);
+};
+
+$("delRow").onclick = function () {
+	if (!picked)
+		return;
+
+	rows.splice(picked.r, 1);
+	checks.splice(picked.r, 1);
+	draw();
+};
+
+$("delCol").onclick = function () {
+	if (!picked)
+		return;
+
+	fill();
+
+	for (var r = 0; r < rows.length; ++r) {
+		rows[r].splice(picked.c, 1);
+
+		if (checks[r])
+			checks[r].splice(picked.c, 1);
+	}
+
+	draw();
+};
+
+/* ---------------------------------------------------------------- SAVING */
+/* THE CELLS THE USER FIXED: PICCELL READS THEIR WORDS RIGHT FROM NOW ON */
+function learn() {
+	if (document.activeElement && document.activeElement.blur)
+		document.activeElement.blur();
+
+	if (toLearn.length)
+		piccell.learn(toLearn);
+
+	toLearn = [];
+}
+
+function save(kind) {
+	fill();
+	learn();
+	piccell.save(kind, rows, lang).then(function (answer) {
+		if (!answer || answer.cancel)
+			return;
+
+		if (answer.code) {
+			say(problem(answer.code), true);
+			return;
+		}
+
+		say(t("saved", { p: answer.path }), false, answer.path);
+	});
+}
+
+$("xlsx").onclick = function () { save("xlsx"); };
+$("csv").onclick = function () { save("csv"); };
+$("pdf").onclick = function () { save("pdf"); };
+
+$("copy").onclick = function () {
+	fill();
+	learn();
+	piccell.copy(rows).then(function () { say(t("copied")); });
+};
+
+/* ----------------------------------------------------------------- UPDATES */
+/* A NEW RELEASE IS DOWNLOADED IN THE BACKGROUND; IT IS USED WHEN THE WINDOW
+   CLOSES, OR NOW. WITH A TABLE ON THE SCREEN, "RESTART" ASKS ONE MORE CLICK. */
+$("restart").onclick = function () {
+	if (rows.length && !sure) {
+		sure = true;
+		$("restart").textContent = t("restartSure");
+		return;
+	}
+
+	piccell.restart().then(function (answer) {
+		if (answer.code)
+			say(t("e0"), true);
+	});
+};
+
+function lookForUpdate() {
+	piccell.update().then(function (answer) {
+		if (!answer.ready)
+			return;
+
+		newTag = answer.tag;
+		$("news").className = "on";
+		paint();
+	});
+}
+
+/* -------------------------------------------------------------- CROPPING */
+/* DRAG OVER THE PHOTO: A BOX. CROP MAKES IT THE PHOTO; READ CROPS FIRST. */
+function photoPoint(e) {
+	var r = $("photo").getBoundingClientRect();
+	var x = (e.clientX - r.left) / r.width;
+	var y = (e.clientY - r.top) / r.height;
+
+	return { x: Math.min(1, Math.max(0, x)), y: Math.min(1, Math.max(0, y)) };
+}
+
+function drawSelection() {
+	var box = $("sel");
+	var bar = $("cropBar");
+
+	if (!sel || !hasPhoto) {
+		box.className = "";
+		bar.className = "";
+		return;
+	}
+
+	var drop = $("drop");
+	var d = drop.getBoundingClientRect();
+	var r = $("photo").getBoundingClientRect();
+	var left = r.left - d.left - drop.clientLeft + sel.x0 * r.width;
+	var top = r.top - d.top - drop.clientTop + sel.y0 * r.height;
+	var w = (sel.x1 - sel.x0) * r.width;
+	var h = (sel.y1 - sel.y0) * r.height;
+
+	box.style.left = left + "px";
+	box.style.top = top + "px";
+	box.style.width = w + "px";
+	box.style.height = h + "px";
+	box.className = "on";
+
+	if (dragFrom) {
+		bar.className = "";
+		return;
+	}
+
+	/* THE BUTTONS UNDER THE BOX, OR INSIDE IT WHEN THERE IS NO ROOM */
+	bar.className = "on";
+
+	var barTop = top + h + 8;
+
+	if (barTop + bar.offsetHeight > drop.clientHeight - 4)
+		barTop = top + h - bar.offsetHeight - 8;
+
+	var barLeft = left + w - bar.offsetWidth;
+
+	if (barLeft < 4)
+		barLeft = 4;
+
+	bar.style.left = barLeft + "px";
+	bar.style.top = barTop + "px";
+}
+
+function setSelection(box) {
+	sel = box;
+	drawSelection();
+}
+
+$("photo").onmousedown = function (e) {
+	if (busy || !hasPhoto || e.button !== 0)
+		return;
+
+	e.preventDefault();
+	dragFrom = photoPoint(e);
+	setSelection(null);
+};
+
+document.addEventListener("mousemove", function (e) {
+	if (!dragFrom)
+		return;
+
+	var p = photoPoint(e);
+
+	setSelection({
+		x0: Math.min(dragFrom.x, p.x), y0: Math.min(dragFrom.y, p.y),
+		x1: Math.max(dragFrom.x, p.x), y1: Math.max(dragFrom.y, p.y)
+	});
+});
+
+document.addEventListener("mouseup", function () {
+	if (!dragFrom)
+		return;
+
+	dragFrom = null;
+
+	var r = $("photo").getBoundingClientRect();
+
+	/* A CLICK, NOT A BOX */
+	if (!sel || (sel.x1 - sel.x0) * r.width < 12 || (sel.y1 - sel.y0) * r.height < 12) {
+		setSelection(null);
+		return;
+	}
+
+	drawSelection();
+	say(t("selected"));
+});
+
+document.addEventListener("keydown", function (e) {
+	if ((e.key == "Escape" || e.keyCode == 27) && sel) {
+		setSelection(null);
+		say(t("ready"));
+	}
+});
+
+window.addEventListener("resize", drawSelection);
+
+/* THEN() RUNS WHEN THE CROP IS THE PHOTO */
+function applyCrop(then) {
+	var box = sel;
+
+	setSelection(null);
+	setBusy(true);
+	piccell.crop(box.x0, box.y0, box.x1, box.y1).then(function (answer) {
+		setBusy(false);
+
+		if (!answer || answer.code) {
+			say(problem(answer ? answer.code : 0), true);
+			return;
+		}
+
+		showPhoto(answer, true);
+
+		if (then)
+			then();
+	}, function () {
+		setBusy(false);
+		say(t("e0"), true);
+	});
+}
+
+$("crop").onclick = function () { applyCrop(null); };
+
+$("noSel").onclick = function () {
+	setSelection(null);
+	say(t("ready"));
+};
+
+$("whole").onclick = function () {
+	if (busy)
+		return;
+
+	setBusy(true);
+	piccell.whole().then(function (answer) {
+		setBusy(false);
+		showPhoto(answer, false);
+	}, function () {
+		setBusy(false);
+		say(t("e0"), true);
+	});
+};
+
+/* ---------------------------------------------------------------- SWITCHES */
+var modes = $("mode").querySelectorAll("button");
+
+for (var i = 0; i < modes.length; ++i) {
+	modes[i].onclick = function () {
+		mode = this.getAttribute("data-mode");
+
+		for (var j = 0; j < modes.length; ++j)
+			modes[j].className = modes[j] == this ? "on" : "";
+	};
+}
+
+var langs = $("lang").querySelectorAll("button");
+
+for (var k = 0; k < langs.length; ++k) {
+	langs[k].onclick = function () {
+		lang = this.getAttribute("data-lang");
+		paint();
+		say(t("ready"));
+		piccell.language(lang);
+	};
+}
+
+piccell.info().then(function (info) {
+	lang = info.lang == "en" ? "en" : "tr";
+	paint();
+	say(t("ready"));
+
+	if (!info.ocr)
+		$("mode").querySelector("[data-mode='print']").disabled = true;
+
+	if (info.version)
+		$("version").textContent = info.version;
+
+	lookForUpdate();
+});
+
+paint();
+update();
+</script>
+</body>
+</html>

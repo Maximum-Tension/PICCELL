@@ -1,0 +1,109 @@
+/******************************************************************************\
+# piccell                                        #       Maximum Tension       #
+################################################################################
+#                                                #      -__            __-     #
+# Teoman Deniz                                   #  :    :!1!-_    _-!1!:    : #
+# maximum-tension.com                            #  ::                      :: #
+#                                                #  :!:    : :: : :  :  ::::!: #
+# +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
+# : C - Maximum Tension :: Create - 2026/11/20 : #   ::!::!!1001010!:!11!!::   #
+# :---------------------::---------------------: #   :!1!!11000000000011!!:    #
+# : License - GPL-3.0   :: Update - 2026/11/21 : #    ::::!!!1!!1!!!1!!!::     #
+# +.....................++.....................+ #       ::::!::!:::!::::      #
+\******************************************************************************/
+
+/******************************************************************************\
+|* __________________________________________________________________________ *|
+|*|                             PICCELL RESOURCES                            |*|
+|*|__________________________________________________________________________|*|
+|*|             ________                                                     |*|
+|*| EVERYTHING THAT IS BUILT INTO PICCELL.EXE BESIDES THE CODE: THE ICON,    |*|
+|*| THE MANIFEST, THE HANDWRITING READER, THE PAGE OF THE WINDOW,            |*|
+|*| MICROSOFT'S WEBVIEW2LOADER.DLL AND THE VERSION DETAILS WINDOWS SHOWS IN  |*|
+|*| THE FILE'S PROPERTIES, IN ENGLISH AND TURKISH.                           |*|
+|*| THE VERSION NUMBERS COME FROM SRC/VERSION.H, SO THEY ARE CHANGED IN ONE  |*|
+|*| PLACE ONLY (WINDRES -I SRC). THIS FILE IS UTF-8.                         |*|
+|*|__________________________________________________________________________|*|
+|*'..........................................................................'*|
+
+#pragma code_page(65001)
+
+/* **************************** [v] INCLUDES [v] **************************** */
+#include <windows.h>
+/******* """""""""""
+ * #define RT_MANIFEST
+ * #define RT_RCDATA
+ */
+#include "version.h"
+/******* """""""""""
+ * #define PICCELL_VERSION_LIST
+ * #define PICCELL_VERSION_TEXT
+ */
+/* **************************** [^] INCLUDES [^] **************************** */
+
+/* ***************************** [v] FILES [v] ****************************** */
+1 ICON "piccell.ico"
+1 RT_MANIFEST "piccell.manifest"
+/* THE HANDWRITING READER (TOOLS/HAND/EXPORT_READER.PY) AND THE WINDOW */
+READER RCDATA "reader.bin"
+UI RCDATA "ui.html"
+/* MICROSOFT'S WEBVIEW2LOADER.DLL, LOADED FROM MEMORY (WEBVIEW/README) */
+#ifdef PICCELL_X64
+WEBVIEW2LOADER RCDATA "webview/ms.webview2/x64/WebView2Loader.dll"
+#else /* !PICCELL_X64 */
+WEBVIEW2LOADER RCDATA "webview/ms.webview2/x86/WebView2Loader.dll"
+#endif /* PICCELL_X64 */
+/* ***************************** [^] FILES [^] ****************************** */
+
+/* ************************ [v] VERSION DETAILS [v] ************************* */
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION		PICCELL_VERSION_LIST
+PRODUCTVERSION	PICCELL_VERSION_LIST
+FILEFLAGSMASK	0X3F
+FILEFLAGS	0X0
+FILEOS		VOS_NT_WINDOWS32
+FILETYPE	VFT_APP
+{
+	BLOCK "StringFileInfo"
+	{
+		BLOCK "040904B0"
+		{
+			VALUE "CompanyName", "Maximum Tension Lab."
+			VALUE "Developer", "Teoman Deniz"
+			VALUE "OriginalFilename", "PICCELL.exe"
+			VALUE "Comments", "A photo of a table to Excel, CSV or PDF"
+			VALUE "FileDescription", "PICCELL - a photo of a table to Excel"
+			VALUE "InternalName", "PICCELL"
+			VALUE "ProductName", "PICCELL"
+			VALUE "LegalCopyright", "© 2026 Maximum Tension Lab."
+			VALUE "License", "GPL-3.0"
+			VALUE "FileVersion", PICCELL_VERSION_TEXT
+			VALUE "ProductVersion", PICCELL_VERSION_TEXT
+			VALUE "URL", "https://maximum-tension.com"
+			VALUE "Repository", "https://github.com/Maximum-Tension/PICCELL"
+		}
+
+		BLOCK "041F04B0"
+		{
+			VALUE "CompanyName", "Maximum Tension Lab."
+			VALUE "Developer", "Teoman Deniz"
+			VALUE "OriginalFilename", "PICCELL.exe"
+			VALUE "Comments", "Tablo fotoğrafından Excel, CSV ya da PDF"
+			VALUE "FileDescription", "PICCELL - tablo fotoğrafından Excel'e"
+			VALUE "InternalName", "PICCELL"
+			VALUE "ProductName", "PICCELL"
+			VALUE "LegalCopyright", "© 2026 Maximum Tension Lab."
+			VALUE "License", "GPL-3.0"
+			VALUE "FileVersion", PICCELL_VERSION_TEXT
+			VALUE "ProductVersion", PICCELL_VERSION_TEXT
+			VALUE "URL", "https://maximum-tension.com"
+			VALUE "Repository", "https://github.com/Maximum-Tension/PICCELL"
+		}
+	}
+
+	BLOCK "VarFileInfo"
+	{
+		VALUE "Translation", 0X0409, 0X04B0, 0X041F, 0X04B0
+	}
+}
+/* ************************ [^] VERSION DETAILS [^] ************************* */
