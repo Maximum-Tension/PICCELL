@@ -1,6 +1,6 @@
 <p align="center">
-  <img width="257" height="314" alt="icon" src="IMG/IMG1.png"/>
-  <img width="1182" height="792" alt="preview" src="IMG/IMG2.png"/>
+ <img width="257" height="314" alt="icon" src="IMG/IMG1.png"/>
+ <img width="1182" height="792" alt="preview" src="IMG/IMG2.png"/>
 </p>
 
 **PICCELL** (picture to cell) turns a photo of a table, **printed or handwritten**, into real Office data: Excel cells, an `.xlsx`, a CSV or a PDF. Right-click a cell in Excel and pick the photo, or open PICCELL and drop the photo on it.
@@ -15,7 +15,7 @@ I made PICCELL for someone who gets tables on paper and had to type every number
 * **Real numbers.** `1.234,56` and `12.05.2026` become a number and a date, the same as typing them.
 * **Excel, CSV, PDF.** From the window, from Excel, or from the command line. The `.xlsx` and the PDF are written by PICCELL itself, no Office needed.
 * **One small program.** One exe of about 2 MB with the reader and the window inside, and an optional Excel add-in. Windows 7 to 11, 64-bit and 32-bit. English and Turkish.
-* **Updates itself.** Like INWAY: when the window opens, it looks at the GitHub releases, downloads a new one, checks it with the SHA-256 GitHub gives, and opens again as the new version.
+* **Updates itself, only when you open it.** Before the window opens, it looks at the GitHub releases, downloads a new one, checks it with the SHA-256 GitHub gives, and starts as the new version. **Never while you work.**
 
 <details>
   <summary><strong>Table of Contents</strong></summary>
@@ -166,13 +166,16 @@ If the menu ever goes missing, **`ALT` + `F8`** and run **`PICCELL_MENU`**.
 
 # Updates
 
-When the window opens, PICCELL asks GitHub for the latest release in the background and reads the **SHA-256** GitHub gives for its `PICCELL.exe` (the `digest` you see under every release file; the 32-bit one reads `PICCELL32.exe`). Then it hashes **its own EXE**. **Different hash = update.** So two releases on the same day (`20.26.11.20-Mk1145`, then `20.26.11.20-Mk1151`) work too.
+> **PICCELL only updates when you open it, before the window opens. Never while you work.**
 
-**It works like INWAY's updater:**
+First it asks GitHub for the latest release and reads the **SHA-256** GitHub gives for its `PICCELL.exe` (the `digest` you see under every release file; the 32-bit one reads `PICCELL32.exe`). Then it hashes **its own EXE**. **Different hash = update.** So two releases on the same day (`20.26.11.20-Mk1145`, then `20.26.11.20-Mk1151`) work too.
 
-1. It downloads `PICCELL.exe` (or `PICCELL32.exe`) of that release into `%TMP%` and checks its SHA-256 against the same `digest` again. Wrong or missing: no update.
-2. **The new EXE takes the old one's place right away:** the window says **Installing PICCELL 20.26.11.25, opening again...**, closes, and opens again as the new version with **Updated to PICCELL 20.26.11.25.** at the bottom. It takes a few seconds, and the window opens at once even without internet.
-3. **If you already opened a photo or a table**, nothing is closed under you: a green box at the top says **PICCELL 20.26.11.25 is ready**, and the new EXE goes in place when you close the window, or now with **Restart now** (with a table on the screen it asks one more click, because the table would be lost).
+1. **No update:** the window opens. Without internet it opens at once.
+2. **Update:** it downloads that `PICCELL.exe` (or `PICCELL32.exe`) into `%TMP%` and checks its SHA-256 against the same `digest` again. Wrong or missing: no update, the window opens.
+3. The running EXE **moves itself into `%TMP%`**, the new EXE takes its name and starts, and the old one closes.
+4. The new EXE **deletes the old one from `%TMP%`** and opens the window, with **Updated to PICCELL 20.26.11.25.** at the bottom.
+
+When it takes longer than a moment (a slow network, or the download), a small window says what happens: **Downloading PICCELL 20.26.11.25... 45%**. **Close it to skip the update this time**, and PICCELL opens as it is. Two PICCELLs opened at once: only one of them updates.
 
 Two rules keep it safe:
 

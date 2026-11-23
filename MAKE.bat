@@ -36,17 +36,6 @@ IF /I "%~1"=="clean" (
 	EXIT /B 0
 )
 
-IF "%~1"=="32" (
-	IF NOT EXIST "C:\mingw32\bin\gcc.exe" (
-		ECHO C:\mingw32\bin\gcc.exe was not found. Put a 32-bit MinGW-w64 there.
-		EXIT /B 1
-	)
-
-	SET "PATH=C:\mingw32\bin;!PATH!"
-	SET OUT=PICCELL32.exe
-	SET BUILD=build32
-)
-
 WHERE gcc >NUL 2>NUL
 
 IF ERRORLEVEL 1 (

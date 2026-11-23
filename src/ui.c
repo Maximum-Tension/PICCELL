@@ -26,8 +26,6 @@
 #   piccell.show(path)         THE SAVED FILE OPENS (IN EXCEL...)
 #   piccell.learn(texts)       THE CELLS THE USER FIXED BECOME KNOWN WORDS
 #   piccell.language(lang)     "tr" OR "en"
-#   piccell.update()           {ready, tag}, WHEN THE UPDATE CHECK ENDS
-#   piccell.restart()          THE NEW EXE THAT IS READY OPENS INSTEAD, NOW
 # A CANCELLED DIALOG ANSWERS {cancel: 1}.
 */
 
@@ -49,7 +47,6 @@
  * int	webview_return(struct webview *, const char *, int, const char *);
  * void	webview_set_app_name(const char *);
  * int	webview_set_html(struct webview *, const char *);
- * void	webview_terminate(struct webview *);
  */
 #include <wv_value.h>
 /******* """"""""""""
@@ -210,15 +207,9 @@
 /******* """""""""""
  * #define PICCELL_VERSION_TEXT
  */
-#include "update.h"
-/******* """"""""""
- * #define UPDATE_READY
- * int	UPDATE_APPLY(int);
- * int	UPDATE_FIND(char *, size_t);
- */
 #include "ui.h"
 /******* """"""
- * int	UI_RUN(const WCHAR *, int, int);
+ * int	UI_RUN(const WCHAR *, int);
  */
 /* **************************** [^] INCLUDES [^] **************************** */
 
@@ -243,9 +234,7 @@ static struct webview		G__VIEW__;
 static struct S_PICTURE		G__PICTURE__;
 static struct S_PICTURE		G__WHOLE__; /* BEFORE THE CROP. BGRA NULL = NONE */
 static volatile LONG		G__BUSY__;
-static volatile LONG		G__ASKED__; /* THE PAGE ASKED FOR THE UPDATE */
 static int					G__ENGLISH__;
-static int					G__UPDATES__; /* 0 = -NOUPDATE */
 static int					G__UPDATED__; /* 1 = -UPDATED: IT JUST HAPPENED */
 
 /* .,,,,. #==========================================================# .,,,,. */
@@ -1157,113 +1146,6 @@ static void
 	webview_return(W, SEQ, 0, "{\"code\":0}");
 }
 
-/* .,,,,. #==========================================================# .,,,,. */
-/*  \\//  |                         UPDATES                          |  \\//  */
-/*   \/   #==========================================================#   \/   */
-/* THE CHECK AND THE DOWNLOAD (SECONDS), THEN THE ANSWER TO PICCELL.UPDATE() */
-static DWORD WINAPI
-	UPDATE_THREAD(LPVOID PARAMETER)
-{
-	char	*SEQ;
-	char	TAG[64];
-	char	SAFE[64];
-	char	ANSWER_TEXT[128];
-	int		I;
-	int		N;
-
-	SEQ = (char *)PARAMETER;
-	N = 0;
-
-	if (UPDATE_FIND(TAG, sizeof(TAG)) == UPDATE_READY)
-	{
-		/* ONLY THE LETTERS A TAG NEEDS, SO IT CAN NOT BREAK THE ANSWER */
-		for (I = 0; TAG[I] && N + 1 < (int)sizeof(SAFE); ++I)
-			if (
-				(TAG[I] >= '0' && TAG[I] <= '9') ||
-				(TAG[I] >= 'A' && TAG[I] <= 'Z') ||
-				(TAG[I] >= 'a' && TAG[I] <= 'z') ||
-				TAG[I] == '.' ||
-				TAG[I] == '-' ||
-				TAG[I] == '_'
-			)
-				SAFE[N++] = TAG[I];
-	}
-
-	SAFE[N] = '\0';
-
-	if (N)
-		snprintf(
-			ANSWER_TEXT,
-			sizeof(ANSWER_TEXT),
-			"{\"ready\":1,\"tag\":\"%s\"}",
-			SAFE
-		);
-	else
-		snprintf(ANSWER_TEXT, sizeof(ANSWER_TEXT), "{\"ready\":0}");
-
-	webview_return(&G__VIEW__, SEQ, 0, ANSWER_TEXT);
-	free(SEQ);
-	return (0);
-}
-
-/* {"ready":1,"tag":"20.26.11.25"} ONCE THE NEW EXE IS HERE, ELSE READY 0 */
-static void
-	ON_UPDATE(struct webview *W, const char *SEQ, const char *ARGS, void *DATA)
-{
-	char			*COPY;
-	HANDLE			THREAD;
-	const size_t	SIZE = strlen(SEQ) + 1;
-
-	(void)ARGS;
-	(void)DATA;
-
-	if (!G__UPDATES__ || InterlockedExchange(&G__ASKED__, 1))
-	{
-		webview_return(W, SEQ, 0, "{\"ready\":0}");
-		return ;
-	}
-
-	COPY = (char *)malloc(SIZE);
-
-	if (!COPY)
-	{
-		webview_return(W, SEQ, 0, "{\"ready\":0}");
-		return ;
-	}
-
-	memcpy(COPY, SEQ, SIZE);
-	THREAD = CreateThread(NULL, 0, UPDATE_THREAD, COPY, 0, NULL);
-
-	if (!THREAD)
-	{
-		free(COPY);
-		webview_return(W, SEQ, 0, "{\"ready\":0}");
-		return ;
-	}
-
-	CloseHandle(THREAD);
-}
-
-/* "RESTART NOW": THE NEW EXE TAKES OVER AND OPENS THE WINDOW AGAIN */
-static void
-	ON_RESTART(struct webview *W, const char *SEQ, const char *ARGS, void *DATA)
-{
-	(void)ARGS;
-	(void)DATA;
-
-	if (!UPDATE_APPLY(1))
-	{
-		webview_return(W, SEQ, 0, "{\"code\":5}");
-		return ;
-	}
-
-	webview_return(W, SEQ, 0, "{\"code\":0}");
-	webview_terminate(W);
-}
-/*   /\   #==========================================================#   /\   */
-/*  //\\  |                         UPDATES                          |  //\\  */
-/* '""""' #==========================================================# '""""' */
-
 /* THE PAGE FROM THE "UI" RESOURCE, ENDING WITH 0. NULL = NONE */
 static char
 	*LOAD_PAGE(void)
@@ -1299,11 +1181,10 @@ static char
 }
 
 int
-	UI_RUN(const WCHAR *WORD_FILE, int UPDATES, int UPDATED)
+	UI_RUN(const WCHAR *WORD_FILE, int UPDATED)
 {
 	char	*PAGE;
 
-	G__UPDATES__ = UPDATES;
 	G__UPDATED__ = UPDATED;
 	CONVERT_START(WORD_FILE);
 	G__ENGLISH__ = PRIMARYLANGID(GetUserDefaultUILanguage()) != LANG_TURKISH;
@@ -1335,8 +1216,6 @@ int
 	webview_bind(&G__VIEW__, "piccell.show", ON_SHOW, NULL);
 	webview_bind(&G__VIEW__, "piccell.learn", ON_LEARN, NULL);
 	webview_bind(&G__VIEW__, "piccell.language", ON_LANGUAGE, NULL);
-	webview_bind(&G__VIEW__, "piccell.update", ON_UPDATE, NULL);
-	webview_bind(&G__VIEW__, "piccell.restart", ON_RESTART, NULL);
 
 	if (webview_init(&G__VIEW__) != 0)
 	{
@@ -1355,9 +1234,8 @@ int
 	while (webview_loop(&G__VIEW__, 1) == 0)
 	{}
 
-	/* A READ OR A DOWNLOAD STILL RUNNING ENDS WITH THE PROCESS */
+	/* A READ STILL RUNNING ENDS WITH THE PROCESS */
 	webview_exit(&G__VIEW__);
-	UPDATE_APPLY(0); /* A NEW EXE THAT IS READY TAKES THIS ONE'S PLACE */
 	free(PAGE);
 	PICTURE_FREE(&G__PICTURE__);
 	PICTURE_FREE(&G__WHOLE__);

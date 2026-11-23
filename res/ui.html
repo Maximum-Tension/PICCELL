@@ -79,19 +79,6 @@ header h1 small {
 
 header .grow { flex: 1; }
 
-#news {
-	display: none;
-	align-items: center;
-	gap: 10px;
-	padding: 4px 4px 4px 12px;
-	border: 1px solid var(--accent);
-	border-radius: 8px;
-	font-size: 13px;
-}
-
-#news.on { display: flex; }
-#news button { padding: 4px 10px; }
-
 .segment {
 	display: inline-flex;
 	border: 1px solid var(--line);
@@ -374,7 +361,6 @@ tr.title td div { font-weight: 600; }
 			<button data-mode="hand" data-t="hand"></button>
 		</div>
 		<div class="grow"></div>
-		<div id="news"><span id="newsText"></span><button id="restart" data-t="restart"></button></div>
 		<div class="segment" id="lang">
 			<button data-lang="tr">TR</button>
 			<button data-lang="en">EN</button>
@@ -452,11 +438,7 @@ var TEXT = {
 		e6: "Dosya yazılamadı (başka bir programda açık mı?).",
 		e7: "El yazısı okuyucusu bu PICCELL.exe'de yok.",
 		e0: "Bir sorun çıktı.",
-		news: "PICCELL {v} hazır: bu pencere kapanınca yerine konur.",
-		updating: "PICCELL {v} kuruluyor, yeniden açılıyor...",
-		updated: "PICCELL {v} sürümüne güncellendi.",
-		restart: "Şimdi yeniden başlat",
-		restartSure: "Tablo kaybolacak. Yine de başlat"
+		updated: "PICCELL {v} sürümüne güncellendi."
 	},
 	en: {
 		auto: "Automatic", print: "Printed", hand: "Handwritten",
@@ -490,11 +472,7 @@ var TEXT = {
 		e6: "The file could not be written (is it open in another program?).",
 		e7: "This PICCELL.exe has no handwriting reader.",
 		e0: "Something went wrong.",
-		news: "PICCELL {v} is ready: it goes in place when this window closes.",
-		updating: "Installing PICCELL {v}, opening again...",
-		updated: "Updated to PICCELL {v}.",
-		restart: "Restart now",
-		restartSure: "The table will be lost. Restart anyway"
+		updated: "Updated to PICCELL {v}."
 	}
 };
 
@@ -506,8 +484,6 @@ var picked = null;
 var toLearn = [];
 var hasPhoto = false;
 var busy = false;
-var newTag = "";
-var sure = false;
 var sel = null; /* THE BOX OVER THE PHOTO: x0, y0, x1, y1 FROM 0 TO 1 */
 var dragFrom = null;
 var cropped = false;
@@ -539,12 +515,6 @@ function paint() {
 
 	for (var j = 0; j < langs.length; ++j)
 		langs[j].className = langs[j].getAttribute("data-lang") == lang ? "on" : "";
-
-	if (newTag)
-		$("newsText").textContent = t("news", { v: newTag });
-
-	if (sure)
-		$("restart").textContent = t("restartSure");
 }
 
 function say(text, bad, link) {
@@ -1004,56 +974,6 @@ $("copy").onclick = function () {
 	piccell.copy(rows).then(function () { say(t("copied")); });
 };
 
-/* ----------------------------------------------------------------- UPDATES */
-/* A NEW RELEASE IS DOWNLOADED IN THE BACKGROUND. LIKE INWAY, IT TAKES OVER AT
-   ONCE: THE WINDOW OPENS AGAIN AS THE NEW VERSION. WITH A PHOTO OR A TABLE ON
-   THE SCREEN IT WAITS FOR "RESTART NOW" OR FOR THE WINDOW TO CLOSE; WITH A
-   TABLE, "RESTART NOW" ASKS ONE MORE CLICK. */
-$("restart").onclick = function () {
-	if (rows.length && !sure) {
-		sure = true;
-		$("restart").textContent = t("restartSure");
-		return;
-	}
-
-	piccell.restart().then(function (answer) {
-		if (answer.code)
-			say(t("e0"), true);
-	});
-};
-
-function showNews() {
-	$("news").className = "on";
-	paint();
-}
-
-/* IT COULD NOT TAKE OVER NOW: IT WAITS, LIKE WITH A PHOTO ON THE SCREEN */
-function updateLater() {
-	say(t("ready"));
-	showNews();
-}
-
-function lookForUpdate() {
-	piccell.update().then(function (answer) {
-		if (!answer.ready)
-			return;
-
-		newTag = answer.tag;
-
-		/* NOTHING ON THE SCREEN YET: THE NEW ONE OPENS NOW, NOTHING IS LOST */
-		if (!hasPhoto && !rows.length && !busy && !dragFrom) {
-			say(t("updating", { v: newTag }));
-			piccell.restart().then(function (done) {
-				if (!done || done.code)
-					updateLater();
-			}, updateLater);
-			return;
-		}
-
-		showNews();
-	});
-}
-
 /* -------------------------------------------------------------- CROPPING */
 /* DRAG OVER THE PHOTO: A BOX. CROP MAKES IT THE PHOTO; READ CROPS FIRST. */
 function photoPoint(e) {
@@ -1242,10 +1162,9 @@ piccell.info().then(function (info) {
 	if (info.version)
 		$("version").textContent = info.version;
 
+	/* PICCELL UPDATES ITSELF BEFORE THIS WINDOW OPENS (UPDATE.H) */
 	if (info.updated)
 		say(t("updated", { v: info.version }));
-
-	lookForUpdate();
 });
 
 paint();

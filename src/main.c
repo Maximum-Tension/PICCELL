@@ -26,10 +26,10 @@
 # THE KIND OF THE RESULT COMES FROM ITS NAME: .xlsx, .csv, .pdf, OR ANY
 # OTHER NAME FOR TAB SEPARATED TEXT. -dump WRITES WHAT THE OCR SAW, FOR TESTS.
 # -check WRITES A 1 FOR EVERY CELL TO LOOK AT AND A 0 FOR THE OTHERS, SO THE
-# EXCEL ADD-IN CAN MAKE THEM YELLOW. THE WINDOW LOOKS FOR A NEW RELEASE ON
-# GITHUB (UPDATE.H), UNLESS -noupdate IS GIVEN; -update-finish IS THE SECOND
-# HALF OF AN UPDATE AND -updated TELLS THE WINDOW IT JUST HAPPENED: BOTH ARE
-# NOT FOR PEOPLE.
+# EXCEL ADD-IN CAN MAKE THEM YELLOW. BEFORE THE WINDOW OPENS, PICCELL LOOKS
+# FOR A NEW RELEASE ON GITHUB (UPDATE.H), UNLESS -noupdate IS GIVEN. -updated
+# TELLS THE NEW EXE THAT IT JUST TOOK THE OLD ONE'S PLACE, AND -update-finish
+# IS HOW AN OLDER PICCELL HANDS OVER: BOTH ARE NOT FOR PEOPLE.
 */
 
 /* **************************** [v] INCLUDES [v] **************************** */
@@ -98,11 +98,13 @@
  */
 #include "update.h"
 /******* """"""""""
+ * int	UPDATE_AT_START(void);
+ * void	UPDATE_CLEAN(int);
  * void	UPDATE_FINISH(void);
  */
 #include "ui.h"
 /******* """"""
- * int	UI_RUN(const WCHAR *, int, int);
+ * int	UI_RUN(const WCHAR *, int);
  */
 /* **************************** [^] INCLUDES [^] **************************** */
 
@@ -120,8 +122,8 @@ static const char	G__USAGE__[] =
 	"every cell to check and 0 for the others. Exit codes: 0 done,\r\n"
 	"1 usage, 2 not a picture, 3 no picture on the clipboard, 4 no Windows\r\n"
 	"OCR (Windows 10 or 11 needed), 5 no text found, 6 result not written,\r\n"
-	"7 no handwriting reader in PICCELL.exe. The window looks for a new\r\n"
-	"release on GitHub when it opens; -noupdate turns that off.\r\n";
+	"7 no handwriting reader in PICCELL.exe. Before the window opens, it\r\n"
+	"looks for a new release on GitHub; -noupdate turns that off.\r\n";
 
 /* THE HELP, IN THE CONSOLE PICCELL WAS STARTED FROM (IT HAS NONE OF ITS OWN) */
 static void
@@ -260,9 +262,20 @@ int
 			MODE = -1;
 	}
 
-	/* NOTHING BUT -words, -noupdate AND -updated: THE WINDOW */
+	/*
+	# NOTHING BUT -words, -noupdate AND -updated: THE WINDOW. AN UPDATE ONLY
+	# HAPPENS HERE, BEFORE IT OPENS. RIGHT AFTER ONE (-updated) THERE IS NO
+	# NEW CHECK: THIS IS THE LATEST, AND IT CAN NOT GO ROUND.
+	*/
 	if (!SOURCE && !LANGUAGE && !DUMP && !CHECKS && MODE == CONVERT_AUTO)
-		return (UI_RUN(WORD_FILE, UPDATES, UPDATED));
+	{
+		UPDATE_CLEAN(UPDATED);
+
+		if (UPDATES && !UPDATED && UPDATE_AT_START())
+			return (PICCELL_DONE);
+
+		return (UI_RUN(WORD_FILE, UPDATED));
+	}
 
 	if (!SOURCE || !RESULT || MODE < 0)
 	{

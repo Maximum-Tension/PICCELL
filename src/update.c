@@ -14,41 +14,92 @@
 
 /*
 # GITHUB RELEASE CHECK, DOWNLOAD, SHA-256 CHECK AND THE EXE SWAP. SEE UPDATE.H
-# FOR THE STEPS. IT IS INWAY'S UPDATER, MADE FOR A WINDOW: THE CHECK RUNS IN A
-# THREAD, AND THE SWAP WAITS UNTIL THE WINDOW CLOSES.
+# FOR THE STEPS. IT ONLY RUNS WHEN PICCELL STARTS, BEFORE ITS WINDOW OPENS:
+# THE CHECK RUNS IN A THREAD, AND A SMALL WINDOW SAYS WHAT HAPPENS WHEN IT
+# TAKES LONGER THAN A MOMENT.
 */
 
 /* **************************** [v] INCLUDES [v] **************************** */
 #include <windows.h>
 /******* """""""""""
+ * #define COLOR_GRAYTEXT
+ * #define COLOR_WINDOW
+ * #define COLOR_WINDOWTEXT
+ * #define CALLBACK
  * #define CP_UTF8
  * #define CREATE_ALWAYS
  * #define CREATE_NEW
- * #define CREATE_SUSPENDED
+ * #define DT_END_ELLIPSIS
+ * #define DT_LEFT
+ * #define DT_NOPREFIX
+ * #define DT_SINGLELINE
+ * #define DT_VCENTER
+ * #define ERROR_ALREADY_EXISTS
  * #define FALSE
  * #define FILE_ATTRIBUTE_TEMPORARY
  * #define FILE_FLAG_DELETE_ON_CLOSE
  * #define FILE_SHARE_READ
  * #define GENERIC_READ
  * #define GENERIC_WRITE
+ * #define GWL_STYLE
  * #define InterlockedCompareExchange
  * #define InterlockedExchange
+ * #define InterlockedExchangeAdd
  * #define INVALID_FILE_ATTRIBUTES
  * #define INVALID_HANDLE_VALUE
+ * #define LANG_TURKISH
+ * #define LOGPIXELSY
+ * #define MAKEINTRESOURCEW(I)
  * #define MAX_PATH
  * #define MOVEFILE_COPY_ALLOWED
  * #define MOVEFILE_REPLACE_EXISTING
  * #define MOVEFILE_WRITE_THROUGH
  * #define OPEN_EXISTING
+ * #define PM_REMOVE
+ * #define PRIMARYLANGID(L)
+ * #define QS_ALLINPUT
+ * #define SPI_GETNONCLIENTMETRICS
+ * #define SPI_GETWORKAREA
+ * #define SW_SHOWNORMAL
  * #define SYNCHRONIZE
+ * #define TRANSPARENT
+ * #define WAIT_OBJECT_0
+ * #define WINAPI
+ * #define WM_CLOSE
+ * #define WM_ERASEBKGND
+ * #define WM_PAINT
+ * #define WM_USER
+ * #define WS_CAPTION
+ * #define WS_CHILD
+ * #define WS_CLIPCHILDREN
+ * #define WS_EX_APPWINDOW
+ * #define WS_POPUP
+ * #define WS_SYSMENU
+ * #define WS_VISIBLE
  * typedef	DWORD;
  * typedef	HANDLE;
+ * typedef	HDC;
+ * typedef	HFONT;
+ * typedef	HGDIOBJ;
+ * typedef	HINSTANCE;
+ * typedef	HWND;
  * typedef	LONG;
+ * typedef	LONG_PTR;
+ * typedef	LRESULT;
+ * typedef	MSG;
+ * typedef	NONCLIENTMETRICSW;
+ * typedef	PAINTSTRUCT;
  * typedef	PROCESS_INFORMATION;
+ * typedef	RECT;
  * typedef	STARTUPINFOW;
+ * typedef	UINT_PTR;
  * typedef	WCHAR;
  * typedef	WIN32_FIND_DATAW;
+ * typedef	WNDCLASSEXW;
+ * BOOL		AdjustWindowRectEx(LPRECT, DWORD, BOOL, DWORD);
+ * HDC		BeginPaint(HWND, LPPAINTSTRUCT);
  * BOOL		CloseHandle(HANDLE);
+ * BOOL		CopyFileW(LPCWSTR, LPCWSTR, BOOL);
  * HANDLE	CreateFileW(
  * 	LPCWSTR,
  * 	DWORD,
@@ -58,6 +109,8 @@
  * 	DWORD,
  * 	HANDLE
  * );
+ * HFONT	CreateFontIndirectW(const LOGFONTW *);
+ * HANDLE	CreateMutexW(LPSECURITY_ATTRIBUTES, BOOL, LPCWSTR);
  * BOOL		CreateProcessW(
  * 	LPCWSTR,
  * 	LPWSTR,
@@ -70,37 +123,100 @@
  * 	LPSTARTUPINFOW,
  * 	LPPROCESS_INFORMATION
  * );
+ * HANDLE	CreateThread(
+ * 	LPSECURITY_ATTRIBUTES,
+ * 	SIZE_T,
+ * 	LPTHREAD_START_ROUTINE,
+ * 	LPVOID,
+ * 	DWORD,
+ * 	LPDWORD
+ * );
+ * HWND		CreateWindowExW(
+ * 	DWORD,
+ * 	LPCWSTR,
+ * 	LPCWSTR,
+ * 	DWORD,
+ * 	int,
+ * 	int,
+ * 	int,
+ * 	int,
+ * 	HWND,
+ * 	HMENU,
+ * 	HINSTANCE,
+ * 	LPVOID
+ * );
+ * LRESULT	DefWindowProcW(HWND, UINT, WPARAM, LPARAM);
  * BOOL		DeleteFileW(LPCWSTR);
+ * BOOL		DeleteObject(HGDIOBJ);
+ * BOOL		DestroyWindow(HWND);
+ * LRESULT	DispatchMessageW(const MSG *);
+ * int		DrawTextW(HDC, LPCWSTR, int, LPRECT, UINT);
+ * BOOL		EndPaint(HWND, const PAINTSTRUCT *);
+ * int		FillRect(HDC, const RECT *, HBRUSH);
  * BOOL		FindClose(HANDLE);
  * HANDLE	FindFirstFileW(LPCWSTR, LPWIN32_FIND_DATAW);
  * BOOL		FindNextFileW(HANDLE, LPWIN32_FIND_DATAW);
+ * BOOL		GetClientRect(HWND, LPRECT);
  * LPWSTR	GetCommandLineW(void);
  * DWORD	GetCurrentProcessId(void);
+ * HDC		GetDC(HWND);
+ * int		GetDeviceCaps(HDC, int);
  * DWORD	GetFileAttributesW(LPCWSTR);
+ * DWORD	GetLastError(void);
  * DWORD	GetModuleFileNameW(HMODULE, LPWSTR, DWORD);
+ * HMODULE	GetModuleHandleW(LPCWSTR);
+ * DWORD	GetSysColor(int);
+ * HBRUSH	GetSysColorBrush(int);
  * DWORD	GetTempPathW(DWORD, LPWSTR);
  * DWORD	GetTickCount(void);
+ * LANGID	GetUserDefaultUILanguage(void);
+ * LONG_PTR	GetWindowLongPtrW(HWND, int);
+ * BOOL		InvalidateRect(HWND, const RECT *, BOOL);
+ * BOOL		IsWindowVisible(HWND);
+ * HCURSOR	LoadCursorW(HINSTANCE, LPCWSTR);
+ * HICON	LoadIconW(HINSTANCE, LPCWSTR);
+ * int		lstrcmpW(LPCWSTR, LPCWSTR);
  * LPWSTR	lstrcpynW(LPWSTR, LPCWSTR, int);
  * LPWSTR	lstrcpyW(LPWSTR, LPCWSTR);
  * int		lstrlenW(LPCWSTR);
  * BOOL		MoveFileExW(LPCWSTR, LPCWSTR, DWORD);
+ * DWORD	MsgWaitForMultipleObjects(
+ * 	DWORD,
+ * 	const HANDLE *,
+ * 	BOOL,
+ * 	DWORD,
+ * 	DWORD
+ * );
+ * int		MulDiv(int, int, int);
  * int		MultiByteToWideChar(UINT, DWORD, LPCCH, int, LPWSTR, int);
  * HANDLE	OpenProcess(DWORD, BOOL, DWORD);
+ * BOOL		PeekMessageW(LPMSG, HWND, UINT, UINT, UINT);
  * BOOL		ReadFile(HANDLE, LPVOID, DWORD, LPDWORD, LPOVERLAPPED);
- * DWORD	ResumeThread(HANDLE);
+ * ATOM		RegisterClassExW(const WNDCLASSEXW *);
+ * int		ReleaseDC(HWND, HDC);
+ * HGDIOBJ	SelectObject(HDC, HGDIOBJ);
+ * LRESULT	SendMessageW(HWND, UINT, WPARAM, LPARAM);
+ * int		SetBkMode(HDC, int);
+ * BOOL		SetRect(LPRECT, int, int, int, int);
+ * COLORREF	SetTextColor(HDC, COLORREF);
+ * LONG_PTR	SetWindowLongPtrW(HWND, int, LONG_PTR);
+ * BOOL		ShowWindow(HWND, int);
  * void		Sleep(DWORD);
+ * BOOL		SystemParametersInfoW(UINT, UINT, PVOID, UINT);
+ * BOOL		TranslateMessage(const MSG *);
  * DWORD	WaitForSingleObject(HANDLE, DWORD);
- * int		WideCharToMultiByte(
- * 	UINT,
- * 	DWORD,
- * 	LPCWCH,
- * 	int,
- * 	LPSTR,
- * 	int,
- * 	LPCCH,
- * 	LPBOOL
- * );
  * BOOL		WriteFile(HANDLE, LPCVOID, DWORD, LPDWORD, LPOVERLAPPED);
+ */
+#include <commctrl.h>
+/******* """"""""""""
+ * #define ICC_PROGRESS_CLASS
+ * #define PBM_SETMARQUEE
+ * #define PBM_SETPOS
+ * #define PBM_SETRANGE32
+ * #define PBS_MARQUEE
+ * #define PROGRESS_CLASSW
+ * typedef	INITCOMMONCONTROLSEX;
+ * BOOL	InitCommonControlsEx(const INITCOMMONCONTROLSEX *);
  */
 #include <winhttp.h>
 /******* """""""""""
@@ -119,6 +235,7 @@
  * #define WINHTTP_NO_REFERER
  * #define WINHTTP_NO_REQUEST_DATA
  * #define WINHTTP_OPTION_SECURE_PROTOCOLS
+ * #define WINHTTP_QUERY_CONTENT_LENGTH
  * #define WINHTTP_QUERY_FLAG_NUMBER
  * #define WINHTTP_QUERY_STATUS_CODE
  * typedef		HINTERNET;
@@ -227,14 +344,25 @@
 #include "update.h"
 /******* """"""""""
  * #define UPDATE_ASSET
- * #define UPDATE_NONE
- * #define UPDATE_READY
  * #define UPDATE_REPO
  */
 /* **************************** [^] INCLUDES [^] **************************** */
 
 #define HTTP_AGENT L"PICCELL/" L"" PICCELL_VERSION_TEXT
 #define BODY_MAX (2U << 20) /* A RELEASE PAGE IS NEVER THAT BIG */
+#define WAIT_SHOW_MS 800 /* THE WAITING WINDOW ONLY SHOWS AFTER THIS LONG */
+#define WAIT_TICK_MS 100 /* IT LOOKS AT WHAT HAPPENS THIS OFTEN */
+#define CLEAN_TRIES 40 /* X 250 MS: THE OLD EXE MAY STILL BE CLOSING */
+
+#define STEP_LOOK 0 /* ASKING GITHUB */
+#define STEP_DOWNLOAD 1 /* THE NEW EXE IS COMING */
+#define STEP_INSTALL 2 /* THE EXES ARE SWAPPED */
+
+#define STATE_WORK 0 /* THE CHECK RUNS; CLOSING THE WINDOW STILL SKIPS IT */
+#define STATE_SWAP 1 /* THE EXES ARE BEING SWAPPED: TOO LATE TO SKIP */
+#define STATE_SKIP 2 /* THE WAITING WINDOW WAS CLOSED: NO UPDATE THIS TIME */
+#define STATE_STARTED 3 /* THE NEW EXE RUNS: THIS ONE CLOSES */
+#define STATE_NONE 4 /* NO UPDATE */
 
 #ifndef WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_2
 #define WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_2 0X00000800 /* OLD MINGW HEADERS */
@@ -244,6 +372,14 @@
 #define WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_3 0X00002000 /* OLD MINGW HEADERS */
 #endif /* !WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_3 */
 
+#ifndef PBS_MARQUEE
+#define PBS_MARQUEE 0X08 /* OLD MINGW HEADERS */
+#endif /* !PBS_MARQUEE */
+
+#ifndef PBM_SETMARQUEE
+#define PBM_SETMARQUEE (WM_USER + 10) /* OLD MINGW HEADERS */
+#endif /* !PBM_SETMARQUEE */
+
 /* THE ANSWER OF THE RELEASE PAGE, ENDING WITH 0 */
 struct	S_BODY
 {
@@ -252,10 +388,17 @@ struct	S_BODY
 	size_t	ROOM;
 };
 
-/* UPDATE_READY ONCE G__NEW_EXE__ AND G__TAG__ ARE SET */
-static volatile LONG	G__STATE__ = UPDATE_NONE;
-static WCHAR			G__NEW_EXE__[MAX_PATH * 2]; /* THE CHECKED DOWNLOAD */
-static char				G__TAG__[64]; /* ITS RELEASE NAME */
+static volatile LONG	G__STATE__ = STATE_WORK;
+static volatile LONG	G__STEP__ = STEP_LOOK;
+static volatile LONG	G__GOT__; /* BYTES OF THE NEW EXE SO FAR */
+static volatile LONG	G__TOTAL__; /* ITS SIZE, 0 = NOT KNOWN */
+static WCHAR			G__TAG__[64]; /* THE RELEASE NAME, FOR THE WINDOW */
+static WCHAR			G__LINE__[160]; /* WHAT THE WAITING WINDOW SAYS */
+static HWND				G__BAR__; /* ITS PROGRESS BAR */
+static HFONT			G__FONT__;
+static DWORD			G__START__; /* WHEN THE CHECK STARTED */
+static int				G__DPI__ = 96;
+static int				G__ENGLISH__;
 
 /* .,,,,. #==========================================================# .,,,,. */
 /*  \\//  |                           HTTP                           |  \\//  */
@@ -366,7 +509,7 @@ static DWORD
 		return (0);
 
 	ASK_FOR_TLS12(SESSION);
-	WinHttpSetTimeouts(SESSION, 5000, 5000, 8000, TIMEOUT);
+	WinHttpSetTimeouts(SESSION, 3000, 3000, 3000, TIMEOUT);
 	CONNECT = WinHttpConnect(SESSION, HOST, PARTS.nPort, 0);
 	REQUEST = NULL;
 
@@ -425,8 +568,29 @@ static DWORD
 		);
 		OK = (STATUS == 200);
 
+		if (OK && FILE_HANDLE)
+		{
+			DWORD	LENGTH;
+
+			SIZE = sizeof(LENGTH);
+
+			if (
+				WinHttpQueryHeaders(
+					REQUEST,
+					WINHTTP_QUERY_CONTENT_LENGTH | WINHTTP_QUERY_FLAG_NUMBER,
+					WINHTTP_HEADER_NAME_BY_INDEX,
+					&LENGTH,
+					&SIZE,
+					WINHTTP_NO_HEADER_INDEX
+				)
+			)
+				InterlockedExchange(&G__TOTAL__, (LONG)LENGTH);
+		}
+
+		/* A CLOSED WAITING WINDOW STOPS IT AT THE NEXT PIECE */
 		while (
 			OK &&
+			G__STATE__ != STATE_SKIP &&
 			WinHttpReadData(REQUEST, PIECE, sizeof(PIECE), &GOT) &&
 			GOT
 		)
@@ -434,17 +598,20 @@ static DWORD
 			DWORD	DONE;
 
 			if (FILE_HANDLE)
+			{
 				OK = (
 					WriteFile(FILE_HANDLE, PIECE, GOT, &DONE, NULL) &&
 					DONE == GOT
 				);
+				InterlockedExchangeAdd(&G__GOT__, (LONG)GOT);
+			}
 			else if (BODY->LEN + GOT > BODY_MAX)
 				OK = 0;
 			else
 				OK = BODY_ADD(BODY, PIECE, GOT);
 		}
 
-		if (!OK)
+		if (!OK || G__STATE__ == STATE_SKIP)
 			STATUS = 0;
 	}
 
@@ -710,33 +877,6 @@ static WCHAR
 	return (WIDE);
 }
 
-/* UTF-16 TO A NEW UTF-8 STRING (FREE IT). NULL WHEN IT FAILS */
-static char
-	*TO_UTF8(const WCHAR *TEXT)
-{
-	char		*BYTES;
-	const int	SIZE = WideCharToMultiByte(
-		CP_UTF8,
-		0,
-		TEXT,
-		-1,
-		NULL,
-		0,
-		NULL,
-		NULL
-	);
-
-	if (SIZE <= 0)
-		return (NULL);
-
-	BYTES = (char *)malloc((size_t)SIZE);
-
-	if (BYTES)
-		WideCharToMultiByte(CP_UTF8, 0, TEXT, -1, BYTES, SIZE, NULL, NULL);
-
-	return (BYTES);
-}
-
 /* "%TMP%" WITHOUT THE LAST "\" */
 static void
 	TEMP_DIR(WCHAR *OUTPUT)
@@ -806,30 +946,70 @@ static int
 	return (GetFileAttributesW(PATH) != INVALID_FILE_ATTRIBUTES);
 }
 
-/* LEFTOVERS OF AN EARLIER UPDATE THAT COULD NOT BE MOVED OR WAS CUT SHORT */
-static void
-	CLEAN_TEMP(void)
+/*
+# DELETES "<DIR>\<PATTERN>" AND RETURNS HOW MANY ARE STILL THERE: A RUNNING
+# EXE, OR A FILE THAT IS STILL BEING WRITTEN, CAN NOT BE DELETED.
+*/
+static int
+	DELETE_ALL(const WCHAR *DIR, const WCHAR *PATTERN)
 {
 	WIN32_FIND_DATAW	FD;
 	HANDLE				FIND;
-	WCHAR				DIR[MAX_PATH];
 	WCHAR				PATH[MAX_PATH * 2];
+	int					LEFT;
 
-	TEMP_DIR(DIR);
-	swprintf(PATH, MAX_PATH * 2, L"%ls\\PICCELL-NEW-*.exe", DIR);
+	swprintf(PATH, MAX_PATH * 2, L"%ls\\%ls", DIR, PATTERN);
 	FIND = FindFirstFileW(PATH, &FD);
 
 	if (FIND == INVALID_HANDLE_VALUE)
-		return ;
+		return (0);
+
+	LEFT = 0;
 
 	do
 	{
 		swprintf(PATH, MAX_PATH * 2, L"%ls\\%ls", DIR, FD.cFileName);
-		DeleteFileW(PATH); /* FAILS QUIETLY WHILE IT RUNS */
+
+		if (!DeleteFileW(PATH))
+			++LEFT;
 	}
 	while (FindNextFileW(FIND, &FD));
 
 	FindClose(FIND);
+	return (LEFT);
+}
+
+/* THE FOLDER OF THIS EXE, WITHOUT THE LAST "\". 0 = UNKNOWN */
+static int
+	EXE_DIR(WCHAR *OUTPUT)
+{
+	WCHAR	*SLASH;
+
+	OUTPUT[0] = L'\0';
+	GetModuleFileNameW(NULL, OUTPUT, MAX_PATH);
+	SLASH = wcsrchr(OUTPUT, L'\\');
+
+	if (!SLASH)
+		return (0);
+
+	*SLASH = L'\0';
+	return (1);
+}
+
+/* OLD EXES AN UPDATE LEFT BEHIND (SEE SWAP_AND_START): HOW MANY ARE LEFT */
+static int
+	DELETE_OLD(void)
+{
+	WCHAR	DIR[MAX_PATH];
+	int		LEFT;
+
+	TEMP_DIR(DIR);
+	LEFT = DELETE_ALL(DIR, L"PICCELL-OLD-*.exe");
+
+	if (EXE_DIR(DIR))
+		LEFT += DELETE_ALL(DIR, L"PICCELL-OLD-*.exe");
+
+	return (LEFT);
 }
 
 /* THE COMMAND LINE WITHOUT THE EXE NAME AND WITHOUT "-update-finish" */
@@ -886,7 +1066,7 @@ static void
 	);
 }
 
-/* STARTS "EXE" WITH THE GIVEN ARGUMENTS. FLAGS: CREATE_SUSPENDED OR 0 */
+/* STARTS "EXE" WITH THE GIVEN ARGUMENTS. FLAGS GO TO CREATEPROCESSW */
 static int
 	START(
 		const WCHAR *EXE,
@@ -970,7 +1150,7 @@ static int
 			&BODY,
 			NULL,
 			1,
-			8000
+			5000
 		) != 200 ||
 		!BODY.DATA
 	)
@@ -1029,133 +1209,560 @@ static int
 	return (OK);
 }
 
-int
-	UPDATE_FIND(char *TAG, size_t CAP)
+/*
+# THE USER'S WAY: THE RUNNING EXE MOVES ITSELF TO %TMP% (WINDOWS LETS A
+# RUNNING EXE BE RENAMED, NOT DELETED), THE NEW EXE TAKES ITS NAME, AND THE
+# NEW ONE STARTS AND DELETES THE OLD ONE (UPDATE_CLEAN). WHEN %TMP% IS ON
+# ANOTHER DRIVE, A RUNNING EXE CAN NOT GO THERE, SO IT IS RENAMED NEXT TO
+# ITSELF INSTEAD. WHEN A STEP FAILS, THE OLD EXE GOES BACK TO ITS NAME AND
+# JUST OPENS ITS WINDOW: PICCELL.EXE IS NEVER LOST.
+# 1 = THE NEW EXE RUNS NOW.
+*/
+static int
+	SWAP_AND_START(const WCHAR *NEW_EXE)
 {
-	WCHAR	EXE[MAX_PATH];
+	PROCESS_INFORMATION	PI;
+	WCHAR				SELF[MAX_PATH];
+	WCHAR				DIR[MAX_PATH];
+	WCHAR				OLD[MAX_PATH * 2];
+	const unsigned long	PID = GetCurrentProcessId();
+	const unsigned long	ID = GetTickCount();
+
+	GetModuleFileNameW(NULL, SELF, MAX_PATH);
+	TEMP_DIR(DIR);
+	swprintf(
+		OLD,
+		MAX_PATH * 2,
+		L"%ls\\PICCELL-OLD-%lu-%lu.exe",
+		DIR,
+		PID,
+		ID
+	);
+
+	if (!MoveFileExW(SELF, OLD, MOVEFILE_WRITE_THROUGH))
+	{
+		if (!EXE_DIR(DIR))
+		{
+			DeleteFileW(NEW_EXE);
+			return (0);
+		}
+
+		swprintf(
+			OLD,
+			MAX_PATH * 2,
+			L"%ls\\PICCELL-OLD-%lu-%lu.exe",
+			DIR,
+			PID,
+			ID
+		);
+
+		if (!MoveFileExW(SELF, OLD, MOVEFILE_WRITE_THROUGH))
+		{
+			DeleteFileW(NEW_EXE);
+			return (0);
+		}
+	}
+
+	if (
+		!MoveFileExW(
+			NEW_EXE,
+			SELF,
+			MOVEFILE_COPY_ALLOWED | MOVEFILE_WRITE_THROUGH
+		)
+	)
+	{
+		if (!MoveFileExW(OLD, SELF, MOVEFILE_WRITE_THROUGH))
+			CopyFileW(OLD, SELF, FALSE);
+
+		DeleteFileW(NEW_EXE);
+		return (0);
+	}
+
+	/* IT DID NOT START: IT IS IN PLACE FOR NEXT TIME, THIS ONE OPENS NOW */
+	if (!START(SELF, L"-updated", ARGUMENTS(), 0, &PI))
+		return (0);
+
+	CloseHandle(PI.hThread);
+	CloseHandle(PI.hProcess);
+	return (1);
+}
+
+/* THE WHOLE UPDATE. 1 = THE NEW EXE RUNS NOW, 0 = NO UPDATE */
+static int
+	CHECK_AND_SWAP(void)
+{
 	WCHAR	DIR[MAX_PATH];
-	char	NAME[64];
+	WCHAR	NEW_EXE[MAX_PATH * 2];
+	char	TAG[64];
 	char	URL[600];
 	char	SHA[80];
 
-	TAG[0] = '\0';
-	CLEAN_TEMP();
-	GetModuleFileNameW(NULL, EXE, MAX_PATH);
-
-	if (
-		IS_SOURCE_FOLDER(EXE) ||
-		!CAN_WRITE_HERE(EXE) ||
-		!LATEST_RELEASE(
-			NAME,
-			sizeof(NAME),
-			URL,
-			sizeof(URL),
-			SHA,
-			sizeof(SHA)
-		)
-	)
-		return (UPDATE_NONE);
-
 	TEMP_DIR(DIR);
+	DELETE_ALL(DIR, L"PICCELL-NEW-*.exe"); /* A DOWNLOAD THAT WAS CUT SHORT */
+
+	if (!LATEST_RELEASE(TAG, sizeof(TAG), URL, sizeof(URL), SHA, sizeof(SHA)))
+		return (0);
+
+	if (MultiByteToWideChar(CP_UTF8, 0, TAG, -1, G__TAG__, 64) <= 0)
+		G__TAG__[0] = L'\0';
+
+	InterlockedExchange(&G__STEP__, STEP_DOWNLOAD);
 	swprintf(
-		G__NEW_EXE__,
+		NEW_EXE,
 		MAX_PATH * 2,
 		L"%ls\\PICCELL-NEW-%lu.exe",
 		DIR,
 		(unsigned long)GetTickCount()
 	);
 
-	if (!DOWNLOAD_VERIFIED(URL, SHA, G__NEW_EXE__))
-		return (UPDATE_NONE);
-
-	snprintf(G__TAG__, sizeof(G__TAG__), "%s", NAME);
-	snprintf(TAG, CAP, "%s", NAME);
-	InterlockedExchange(&G__STATE__, UPDATE_READY);
-	return (UPDATE_READY);
-}
-
-int
-	UPDATE_APPLY(int OPEN_AGAIN)
-{
-	PROCESS_INFORMATION	PI;
-	WCHAR				EXE[MAX_PATH];
-	WCHAR				NOTE[MAX_PATH * 2];
-	char				*OLD;
-	HANDLE				FILE_HANDLE;
-
-	/* ONLY ONCE: "RESTART NOW", THEN THE WINDOW CLOSES TOO */
-	if (
-		InterlockedCompareExchange(&G__STATE__, UPDATE_NONE, UPDATE_READY) !=
-		UPDATE_READY
-	)
+	if (!DOWNLOAD_VERIFIED(URL, SHA, NEW_EXE))
 		return (0);
 
-	GetModuleFileNameW(NULL, EXE, MAX_PATH);
-
+	/* THE WAITING WINDOW WAS CLOSED MEANWHILE: NO UPDATE THIS TIME */
 	if (
-		!START(
-			G__NEW_EXE__,
-			L"-update-finish",
-			ARGUMENTS(),
-			CREATE_SUSPENDED,
-			&PI
-		)
+		InterlockedCompareExchange(&G__STATE__, STATE_SWAP, STATE_WORK) !=
+		STATE_WORK
 	)
 	{
-		DeleteFileW(G__NEW_EXE__);
+		DeleteFileW(NEW_EXE);
 		return (0);
 	}
 
-	NOTE_PATH(PI.dwProcessId, NOTE);
-	OLD = TO_UTF8(EXE);
-	FILE_HANDLE = CreateFileW(
-		NOTE,
-		GENERIC_WRITE,
-		0,
+	InterlockedExchange(&G__STEP__, STEP_INSTALL);
+	return (SWAP_AND_START(NEW_EXE));
+}
+
+/* THE THREAD OF THE CHECK. PARAMETER: THE MUTEX, CLOSED WHEN IT ENDS */
+static DWORD WINAPI
+	UPDATE_WORK(LPVOID PARAMETER)
+{
+	if (CHECK_AND_SWAP())
+		InterlockedExchange(&G__STATE__, STATE_STARTED);
+	else
+	{
+		InterlockedCompareExchange(&G__STATE__, STATE_NONE, STATE_WORK);
+		InterlockedCompareExchange(&G__STATE__, STATE_NONE, STATE_SWAP);
+	}
+
+	CloseHandle((HANDLE)PARAMETER);
+	return (0);
+}
+
+/* PARAMETER: HOW MANY TIMES TO TRY, 250 MS APART */
+static DWORD WINAPI
+	CLEAN_THREAD(LPVOID PARAMETER)
+{
+	const int	TRIES = (int)(UINT_PTR)PARAMETER;
+	int			I;
+
+	for (I = 0; I < TRIES && DELETE_OLD(); ++I)
+		Sleep(250);
+
+	return (0);
+}
+/*   /\   #==========================================================#   /\   */
+/*  //\\  |                        THE UPDATE                        |  //\\  */
+/* '""""' #==========================================================# '""""' */
+
+/* .,,,,. #==========================================================# .,,,,. */
+/*  \\//  |                    THE WAITING WINDOW                    |  \\//  */
+/*   \/   #==========================================================#   \/   */
+/*
+# WHILE THE CHECK RUNS IN ITS THREAD, THE MAIN THREAD WAITS HERE. WHEN IT
+# TAKES LONGER THAN WAIT_SHOW_MS (A SLOW NETWORK, OR A DOWNLOAD), A SMALL
+# WINDOW SAYS WHAT HAPPENS, SO NOBODY THINKS PICCELL DID NOT OPEN. CLOSING IT
+# SKIPS THE UPDATE THIS TIME AND PICCELL OPENS AS IT IS.
+*/
+#define SCALE(N) MulDiv((N), G__DPI__, 96)
+
+/* THE LINE THE WINDOW SHOWS NOW */
+static void
+	WAIT_TEXT(WCHAR *OUTPUT, size_t CAP)
+{
+	const LONG	STEP = G__STEP__;
+	const LONG	TOTAL = G__TOTAL__;
+	const int	PERCENT = (int)(((long long)G__GOT__ * 100) / (TOTAL + !TOTAL));
+
+	if (STEP == STEP_INSTALL && G__ENGLISH__)
+		swprintf(OUTPUT, CAP, L"Installing PICCELL %ls...", G__TAG__);
+	else if (STEP == STEP_INSTALL)
+		swprintf(OUTPUT, CAP, L"PICCELL %ls kuruluyor...", G__TAG__);
+	else if (STEP == STEP_DOWNLOAD && TOTAL > 0 && G__ENGLISH__)
+		swprintf(
+			OUTPUT,
+			CAP,
+			L"Downloading PICCELL %ls... %d%%",
+			G__TAG__,
+			PERCENT
+		);
+	else if (STEP == STEP_DOWNLOAD && TOTAL > 0)
+		swprintf(
+			OUTPUT,
+			CAP,
+			L"PICCELL %ls indiriliyor... %%%d",
+			G__TAG__,
+			PERCENT
+		);
+	else if (STEP == STEP_DOWNLOAD && G__ENGLISH__)
+		swprintf(OUTPUT, CAP, L"Downloading PICCELL %ls...", G__TAG__);
+	else if (STEP == STEP_DOWNLOAD)
+		swprintf(OUTPUT, CAP, L"PICCELL %ls indiriliyor...", G__TAG__);
+	else if (G__ENGLISH__)
+		swprintf(OUTPUT, CAP, L"Looking for a new version...");
+	else
+		swprintf(OUTPUT, CAP, L"Yeni s\u00FCr\u00FCm aran\u0131yor...");
+}
+
+/* MOVING WHILE THE SIZE IS NOT KNOWN, THEN HOW MUCH IS DOWNLOADED */
+static void
+	WAIT_BAR(void)
+{
+	LONG_PTR	STYLE;
+	const LONG	TOTAL = G__TOTAL__;
+	const int	EXACT = (G__STEP__ == STEP_DOWNLOAD && TOTAL > 0);
+
+	if (!G__BAR__)
+		return ;
+
+	STYLE = GetWindowLongPtrW(G__BAR__, GWL_STYLE);
+
+	if (EXACT && (STYLE & PBS_MARQUEE))
+	{
+		SendMessageW(G__BAR__, PBM_SETMARQUEE, FALSE, 0);
+		SetWindowLongPtrW(G__BAR__, GWL_STYLE, STYLE & ~(LONG_PTR)PBS_MARQUEE);
+		SendMessageW(G__BAR__, PBM_SETRANGE32, 0, 1000);
+	}
+	else if (!EXACT && !(STYLE & PBS_MARQUEE))
+	{
+		SetWindowLongPtrW(G__BAR__, GWL_STYLE, STYLE | PBS_MARQUEE);
+		SendMessageW(G__BAR__, PBM_SETMARQUEE, TRUE, 30);
+	}
+
+	if (EXACT)
+		SendMessageW(
+			G__BAR__,
+			PBM_SETPOS,
+			(WPARAM)(((long long)G__GOT__ * 1000) / TOTAL),
+			0
+		);
+}
+
+static void
+	WAIT_PAINT(HWND WINDOW)
+{
+	PAINTSTRUCT	PS;
+	RECT		AREA;
+	RECT		LINE;
+	HGDIOBJ		OLD_FONT;
+	const HDC	DC = BeginPaint(WINDOW, &PS);
+	const UINT	FLAGS = (
+		DT_LEFT | DT_SINGLELINE | DT_VCENTER | DT_END_ELLIPSIS | DT_NOPREFIX
+	);
+
+	GetClientRect(WINDOW, &AREA);
+	FillRect(DC, &AREA, GetSysColorBrush(COLOR_WINDOW));
+	SetBkMode(DC, TRANSPARENT);
+	OLD_FONT = NULL;
+
+	if (G__FONT__)
+		OLD_FONT = SelectObject(DC, G__FONT__);
+
+	SetTextColor(DC, GetSysColor(COLOR_WINDOWTEXT));
+	SetRect(&LINE, SCALE(16), SCALE(12), AREA.right - SCALE(16), SCALE(38));
+	DrawTextW(DC, G__LINE__, -1, &LINE, FLAGS);
+
+	if (G__STEP__ != STEP_INSTALL)
+	{
+		SetTextColor(DC, GetSysColor(COLOR_GRAYTEXT));
+		SetRect(&LINE, SCALE(16), SCALE(66), AREA.right - SCALE(16), SCALE(92));
+
+		if (G__ENGLISH__)
+			DrawTextW(DC, L"Close this window to skip it.", -1, &LINE, FLAGS);
+		else
+			DrawTextW(
+				DC,
+				L"Atlamak i\u00E7in bu pencereyi kapat\u0131n.",
+				-1,
+				&LINE,
+				FLAGS
+			);
+	}
+
+	if (OLD_FONT)
+		SelectObject(DC, OLD_FONT);
+
+	EndPaint(WINDOW, &PS);
+}
+
+static LRESULT CALLBACK
+	WAIT_PROC(HWND WINDOW, UINT MESSAGE, WPARAM WP, LPARAM LP)
+{
+	switch (MESSAGE)
+	{
+		case (WM_PAINT):
+		{
+			WAIT_PAINT(WINDOW);
+		}
+		return (0);
+		case (WM_ERASEBKGND):
+		{}
+		return (1); /* WM_PAINT FILLS IT: NO FLICKER */
+		case (WM_CLOSE):
+		{
+			/* SKIP THE UPDATE; TOO LATE ONCE THE EXES ARE BEING SWAPPED */
+			InterlockedCompareExchange(&G__STATE__, STATE_SKIP, STATE_WORK);
+		}
+		return (0);
+	}
+
+	return (DefWindowProcW(WINDOW, MESSAGE, WP, LP));
+}
+
+/* NEW TEXT, THE BAR, AND THE WINDOW SHOWS ONCE IT TAKES LONG ENOUGH */
+static void
+	WAIT_TICK(HWND WINDOW)
+{
+	WCHAR	TEXT[160];
+
+	if (!WINDOW)
+		return ;
+
+	WAIT_TEXT(TEXT, 160);
+
+	if (lstrcmpW(TEXT, G__LINE__))
+	{
+		lstrcpynW(G__LINE__, TEXT, 160);
+		InvalidateRect(WINDOW, NULL, FALSE);
+	}
+
+	WAIT_BAR();
+
+	if (!IsWindowVisible(WINDOW) && GetTickCount() - G__START__ >= WAIT_SHOW_MS)
+		ShowWindow(WINDOW, SW_SHOWNORMAL);
+}
+
+/* THE WINDOW, HIDDEN FOR NOW, IN THE MIDDLE OF THE SCREEN. NULL = NONE */
+static HWND
+	WAIT_OPEN(void)
+{
+	WNDCLASSEXW				CLASS;
+	INITCOMMONCONTROLSEX	CONTROLS;
+	NONCLIENTMETRICSW		METRICS;
+	RECT					FRAME;
+	RECT					WORK;
+	HWND					WINDOW;
+	HDC						SCREEN;
+	int						WIDTH;
+	int						HEIGHT;
+	const DWORD				STYLE = (
+		WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_CLIPCHILDREN
+	);
+	const HINSTANCE			SELF = GetModuleHandleW(NULL);
+
+	G__ENGLISH__ = PRIMARYLANGID(GetUserDefaultUILanguage()) != LANG_TURKISH;
+	WAIT_TEXT(G__LINE__, 160);
+	SCREEN = GetDC(NULL);
+
+	if (SCREEN)
+	{
+		G__DPI__ = GetDeviceCaps(SCREEN, LOGPIXELSY);
+		ReleaseDC(NULL, SCREEN);
+	}
+
+	if (G__DPI__ < 96)
+		G__DPI__ = 96;
+
+	memset(&METRICS, 0, sizeof(METRICS));
+	METRICS.cbSize = sizeof(METRICS);
+
+	if (
+		SystemParametersInfoW(
+			SPI_GETNONCLIENTMETRICS,
+			sizeof(METRICS),
+			&METRICS,
+			0
+		)
+	)
+		G__FONT__ = CreateFontIndirectW(&METRICS.lfMessageFont);
+
+	CONTROLS.dwSize = sizeof(CONTROLS);
+	CONTROLS.dwICC = ICC_PROGRESS_CLASS;
+	InitCommonControlsEx(&CONTROLS);
+	memset(&CLASS, 0, sizeof(CLASS));
+	CLASS.cbSize = sizeof(CLASS);
+	CLASS.lpfnWndProc = WAIT_PROC;
+	CLASS.hInstance = SELF;
+	CLASS.hIcon = LoadIconW(SELF, MAKEINTRESOURCEW(1));
+	CLASS.hCursor = LoadCursorW(NULL, MAKEINTRESOURCEW(32512)); /* ARROW */
+	CLASS.lpszClassName = L"PICCELL-UPDATE";
+	RegisterClassExW(&CLASS);
+	SetRect(&FRAME, 0, 0, SCALE(360), SCALE(104));
+	AdjustWindowRectEx(&FRAME, STYLE, FALSE, WS_EX_APPWINDOW);
+	WIDTH = FRAME.right - FRAME.left;
+	HEIGHT = FRAME.bottom - FRAME.top;
+
+	if (!SystemParametersInfoW(SPI_GETWORKAREA, 0, &WORK, 0))
+		SetRect(&WORK, 0, 0, 1024, 768);
+
+	WINDOW = CreateWindowExW(
+		WS_EX_APPWINDOW,
+		L"PICCELL-UPDATE",
+		L"PICCELL",
+		STYLE,
+		WORK.left + (WORK.right - WORK.left - WIDTH) / 2,
+		WORK.top + (WORK.bottom - WORK.top - HEIGHT) / 2,
+		WIDTH,
+		HEIGHT,
 		NULL,
-		CREATE_ALWAYS,
+		NULL,
+		SELF,
+		NULL
+	);
+
+	if (!WINDOW)
+		return (NULL);
+
+	G__BAR__ = CreateWindowExW(
+		0,
+		PROGRESS_CLASSW,
+		NULL,
+		WS_CHILD | WS_VISIBLE | PBS_MARQUEE,
+		SCALE(16),
+		SCALE(44),
+		SCALE(328),
+		SCALE(14),
+		WINDOW,
+		NULL,
+		SELF,
+		NULL
+	);
+
+	if (G__BAR__)
+		SendMessageW(G__BAR__, PBM_SETMARQUEE, TRUE, 30);
+
+	return (WINDOW);
+}
+
+/* UNTIL THE CHECK ENDS OR THE WINDOW IS CLOSED */
+static void
+	WAIT_LOOP(HANDLE THREAD, HWND WINDOW)
+{
+	MSG		MESSAGE;
+	DWORD	WOKE;
+
+	for (;;)
+	{
+		WOKE = MsgWaitForMultipleObjects(
+			1,
+			&THREAD,
+			FALSE,
+			WAIT_TICK_MS,
+			QS_ALLINPUT
+		);
+
+		if (WOKE == WAIT_OBJECT_0 || G__STATE__ == STATE_SKIP)
+			return ;
+
+		while (PeekMessageW(&MESSAGE, NULL, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&MESSAGE);
+			DispatchMessageW(&MESSAGE);
+		}
+
+		WAIT_TICK(WINDOW);
+	}
+}
+/*   /\   #==========================================================#   /\   */
+/*  //\\  |                    THE WAITING WINDOW                    |  //\\  */
+/* '""""' #==========================================================# '""""' */
+
+/* .,,,,. #==========================================================# .,,,,. */
+/*  \\//  |                         THE API                          |  \\//  */
+/*   \/   #==========================================================#   \/   */
+int
+	UPDATE_AT_START(void)
+{
+	WCHAR	EXE[MAX_PATH];
+	HANDLE	MUTEX;
+	HANDLE	THREAD;
+	HWND	WINDOW;
+
+	GetModuleFileNameW(NULL, EXE, MAX_PATH);
+
+	if (IS_SOURCE_FOLDER(EXE) || !CAN_WRITE_HERE(EXE))
+		return (0);
+
+	/* TWO PICCELLS OPENED AT ONCE: ONLY ONE OF THEM UPDATES */
+	MUTEX = CreateMutexW(NULL, FALSE, L"Local\\PICCELL-UPDATE");
+
+	if (!MUTEX)
+		return (0);
+
+	if (GetLastError() == ERROR_ALREADY_EXISTS)
+	{
+		CloseHandle(MUTEX);
+		return (0);
+	}
+
+	G__START__ = GetTickCount();
+	THREAD = CreateThread(NULL, 0, UPDATE_WORK, MUTEX, 0, NULL);
+
+	if (!THREAD)
+	{
+		CloseHandle(MUTEX);
+		return (0);
+	}
+
+	WINDOW = WAIT_OPEN();
+	WAIT_LOOP(THREAD, WINDOW);
+
+	if (WINDOW)
+		DestroyWindow(WINDOW);
+
+	if (G__FONT__)
+		DeleteObject(G__FONT__);
+
+	G__BAR__ = NULL;
+	G__FONT__ = NULL;
+	CloseHandle(THREAD); /* A SKIPPED CHECK ENDS BY ITSELF IN THE BACKGROUND */
+	return (G__STATE__ == STATE_STARTED);
+}
+
+void
+	UPDATE_CLEAN(int UPDATED)
+{
+	HANDLE	THREAD;
+	int		TRIES;
+
+	TRIES = 1;
+
+	if (UPDATED)
+		TRIES = CLEAN_TRIES;
+
+	THREAD = CreateThread(
+		NULL,
+		0,
+		CLEAN_THREAD,
+		(LPVOID)(UINT_PTR)TRIES,
 		0,
 		NULL
 	);
 
-	if (FILE_HANDLE != INVALID_HANDLE_VALUE && OLD)
-	{
-		char	TEXT[MAX_PATH * 4 + 160];
-		DWORD	DONE;
-
-		/* PID OF THIS EXE, ITS PATH, THE RELEASE NAME, OPEN OR QUIET */
-		if (OPEN_AGAIN)
-			snprintf(
-				TEXT,
-				sizeof(TEXT),
-				"%lu\r\n%s\r\n%s\r\nopen\r\n",
-				(unsigned long)GetCurrentProcessId(),
-				OLD,
-				G__TAG__
-			);
-		else
-			snprintf(
-				TEXT,
-				sizeof(TEXT),
-				"%lu\r\n%s\r\n%s\r\nquiet\r\n",
-				(unsigned long)GetCurrentProcessId(),
-				OLD,
-				G__TAG__
-			);
-
-		WriteFile(FILE_HANDLE, TEXT, (DWORD)strlen(TEXT), &DONE, NULL);
-	}
-
-	if (FILE_HANDLE != INVALID_HANDLE_VALUE)
-		CloseHandle(FILE_HANDLE);
-
-	free(OLD);
-	ResumeThread(PI.hThread);
-	CloseHandle(PI.hThread);
-	CloseHandle(PI.hProcess);
-	return (1); /* THE NEW ONE WAITS FOR THIS ONE TO CLOSE */
+	if (THREAD)
+		CloseHandle(THREAD);
 }
+/*   /\   #==========================================================#   /\   */
+/*  //\\  |                         THE API                          |  //\\  */
+/* '""""' #==========================================================# '""""' */
 
+/* .,,,,. #==========================================================# .,,,,. */
+/*  \\//  |                       THE OLD WAY                        |  \\//  */
+/*   \/   #==========================================================#   \/   */
+/*
+# PICCELL 20.26.11.23 AND OLDER UPDATED WHILE THEIR WINDOW WAS OPEN: THEY
+# START THE NEW EXE IN %TMP% WITH "-update-finish" AND A NOTE THAT SAYS WHERE
+# THE OLD EXE IS. SO THIS STAYS, OR THEIR LAST UPDATE COULD NOT FINISH.
+*/
 void
 	UPDATE_FINISH(void)
 {
@@ -1271,5 +1878,5 @@ void
 	free(OLD);
 }
 /*   /\   #==========================================================#   /\   */
-/*  //\\  |                        THE UPDATE                        |  //\\  */
+/*  //\\  |                       THE OLD WAY                        |  //\\  */
 /* '""""' #==========================================================# '""""' */
