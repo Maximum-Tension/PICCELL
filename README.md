@@ -1,4 +1,7 @@
-# PICCELL
+<p align="center">
+  <img width="257" height="314" alt="icon" src="IMG/IMG1.png"/>
+  <img width="1182" height="792" alt="preview" src="IMG/IMG2.png"/>
+</p>
 
 **PICCELL** (picture to cell) turns a photo of a table, **printed or handwritten**, into real Office data: Excel cells, an `.xlsx`, a CSV or a PDF. Right-click a cell in Excel and pick the photo, or open PICCELL and drop the photo on it.
 
@@ -48,10 +51,10 @@ I made PICCELL for someone who gets tables on paper and had to type every number
 >
 > **[PICCELL.exe and PICCELL32.exe][__RELEASES__]**
 
-| EXE | For |
-| --- | --- |
-| **`PICCELL.exe`** | 64-bit Windows (almost every PC today) |
-| **`PICCELL32.exe`** | 32-bit Windows |
+| EXE                 | For                                    |
+| ------------------- | -------------------------------------- |
+| **`PICCELL.exe`**   | 64-bit Windows (almost every PC today) |
+| **`PICCELL32.exe`** | 32-bit Windows                         |
 
 Both work with 32-bit and 64-bit Excel alike: PICCELL does not depend on Office.
 
