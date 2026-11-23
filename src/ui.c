@@ -8,13 +8,13 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2026/11/19 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - GPL-3.0   :: Update - 2026/11/21 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - GPL-3.0   :: Update - 2026/11/23 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
 /*
 # THE PAGE CALLS THESE (EVERY ONE GIVES BACK A PROMISE, SEE WEBVIEW_BIND):
-#   piccell.info()             {lang, ocr, reader, version}
+#   piccell.info()             {lang, ocr, reader, version, updated}
 #   piccell.open()             A PHOTO FROM A FILE: {code, w, h, preview}
 #   piccell.paste()            THE SAME, FROM THE CLIPBOARD
 #   piccell.drop(base64)       THE SAME, FROM THE BYTES OF A DROPPED FILE
@@ -27,7 +27,7 @@
 #   piccell.learn(texts)       THE CELLS THE USER FIXED BECOME KNOWN WORDS
 #   piccell.language(lang)     "tr" OR "en"
 #   piccell.update()           {ready, tag}, WHEN THE UPDATE CHECK ENDS
-#   piccell.restart()          THE NEW EXE THAT IS READY OPENS INSTEAD
+#   piccell.restart()          THE NEW EXE THAT IS READY OPENS INSTEAD, NOW
 # A CANCELLED DIALOG ANSWERS {cancel: 1}.
 */
 
@@ -218,7 +218,7 @@
  */
 #include "ui.h"
 /******* """"""
- * int	UI_RUN(const WCHAR *, int);
+ * int	UI_RUN(const WCHAR *, int, int);
  */
 /* **************************** [^] INCLUDES [^] **************************** */
 
@@ -246,6 +246,7 @@ static volatile LONG		G__BUSY__;
 static volatile LONG		G__ASKED__; /* THE PAGE ASKED FOR THE UPDATE */
 static int					G__ENGLISH__;
 static int					G__UPDATES__; /* 0 = -NOUPDATE */
+static int					G__UPDATED__; /* 1 = -UPDATED: IT JUST HAPPENED */
 
 /* .,,,,. #==========================================================# .,,,,. */
 /*  \\//  |                       SMALL THINGS                       |  \\//  */
@@ -1127,11 +1128,12 @@ static void
 		ANSWER_TEXT,
 		sizeof(ANSWER_TEXT),
 		"{\"lang\":\"%s\",\"ocr\":%d,\"reader\":%d,"
-		"\"version\":\"%s\"}",
+		"\"version\":\"%s\",\"updated\":%d}",
 		LANG,
 		HAS_OCR(),
 		CONVERT_START(NULL),
-		PICCELL_VERSION_TEXT
+		PICCELL_VERSION_TEXT,
+		G__UPDATED__
 	);
 	webview_return(W, SEQ, 0, ANSWER_TEXT);
 }
@@ -1297,11 +1299,12 @@ static char
 }
 
 int
-	UI_RUN(const WCHAR *WORD_FILE, int UPDATES)
+	UI_RUN(const WCHAR *WORD_FILE, int UPDATES, int UPDATED)
 {
 	char	*PAGE;
 
 	G__UPDATES__ = UPDATES;
+	G__UPDATED__ = UPDATED;
 	CONVERT_START(WORD_FILE);
 	G__ENGLISH__ = PRIMARYLANGID(GetUserDefaultUILanguage()) != LANG_TURKISH;
 	PAGE = LOAD_PAGE();

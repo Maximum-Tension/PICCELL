@@ -453,6 +453,8 @@ var TEXT = {
 		e7: "El yazısı okuyucusu bu PICCELL.exe'de yok.",
 		e0: "Bir sorun çıktı.",
 		news: "PICCELL {v} hazır: bu pencere kapanınca yerine konur.",
+		updating: "PICCELL {v} kuruluyor, yeniden açılıyor...",
+		updated: "PICCELL {v} sürümüne güncellendi.",
 		restart: "Şimdi yeniden başlat",
 		restartSure: "Tablo kaybolacak. Yine de başlat"
 	},
@@ -489,6 +491,8 @@ var TEXT = {
 		e7: "This PICCELL.exe has no handwriting reader.",
 		e0: "Something went wrong.",
 		news: "PICCELL {v} is ready: it goes in place when this window closes.",
+		updating: "Installing PICCELL {v}, opening again...",
+		updated: "Updated to PICCELL {v}.",
 		restart: "Restart now",
 		restartSure: "The table will be lost. Restart anyway"
 	}
@@ -1001,8 +1005,10 @@ $("copy").onclick = function () {
 };
 
 /* ----------------------------------------------------------------- UPDATES */
-/* A NEW RELEASE IS DOWNLOADED IN THE BACKGROUND; IT IS USED WHEN THE WINDOW
-   CLOSES, OR NOW. WITH A TABLE ON THE SCREEN, "RESTART" ASKS ONE MORE CLICK. */
+/* A NEW RELEASE IS DOWNLOADED IN THE BACKGROUND. LIKE INWAY, IT TAKES OVER AT
+   ONCE: THE WINDOW OPENS AGAIN AS THE NEW VERSION. WITH A PHOTO OR A TABLE ON
+   THE SCREEN IT WAITS FOR "RESTART NOW" OR FOR THE WINDOW TO CLOSE; WITH A
+   TABLE, "RESTART NOW" ASKS ONE MORE CLICK. */
 $("restart").onclick = function () {
 	if (rows.length && !sure) {
 		sure = true;
@@ -1016,14 +1022,35 @@ $("restart").onclick = function () {
 	});
 };
 
+function showNews() {
+	$("news").className = "on";
+	paint();
+}
+
+/* IT COULD NOT TAKE OVER NOW: IT WAITS, LIKE WITH A PHOTO ON THE SCREEN */
+function updateLater() {
+	say(t("ready"));
+	showNews();
+}
+
 function lookForUpdate() {
 	piccell.update().then(function (answer) {
 		if (!answer.ready)
 			return;
 
 		newTag = answer.tag;
-		$("news").className = "on";
-		paint();
+
+		/* NOTHING ON THE SCREEN YET: THE NEW ONE OPENS NOW, NOTHING IS LOST */
+		if (!hasPhoto && !rows.length && !busy && !dragFrom) {
+			say(t("updating", { v: newTag }));
+			piccell.restart().then(function (done) {
+				if (!done || done.code)
+					updateLater();
+			}, updateLater);
+			return;
+		}
+
+		showNews();
 	});
 }
 
@@ -1214,6 +1241,9 @@ piccell.info().then(function (info) {
 
 	if (info.version)
 		$("version").textContent = info.version;
+
+	if (info.updated)
+		say(t("updated", { v: info.version }));
 
 	lookForUpdate();
 });

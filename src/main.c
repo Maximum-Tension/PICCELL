@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2026/11/18 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - GPL-3.0   :: Update - 2026/11/21 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - GPL-3.0   :: Update - 2026/11/23 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -28,7 +28,8 @@
 # -check WRITES A 1 FOR EVERY CELL TO LOOK AT AND A 0 FOR THE OTHERS, SO THE
 # EXCEL ADD-IN CAN MAKE THEM YELLOW. THE WINDOW LOOKS FOR A NEW RELEASE ON
 # GITHUB (UPDATE.H), UNLESS -noupdate IS GIVEN; -update-finish IS THE SECOND
-# HALF OF AN UPDATE AND NOT FOR PEOPLE.
+# HALF OF AN UPDATE AND -updated TELLS THE WINDOW IT JUST HAPPENED: BOTH ARE
+# NOT FOR PEOPLE.
 */
 
 /* **************************** [v] INCLUDES [v] **************************** */
@@ -101,7 +102,7 @@
  */
 #include "ui.h"
 /******* """"""
- * int	UI_RUN(const WCHAR *, int);
+ * int	UI_RUN(const WCHAR *, int, int);
  */
 /* **************************** [^] INCLUDES [^] **************************** */
 
@@ -214,6 +215,7 @@ int
 	const WCHAR			*CHECKS;
 	int					MODE;
 	int					UPDATES;
+	int					UPDATED;
 	int					USED;
 	int					CODE;
 	int					I;
@@ -226,6 +228,7 @@ int
 	CHECKS = NULL;
 	MODE = CONVERT_AUTO;
 	UPDATES = 1;
+	UPDATED = 0;
 
 	if (argc >= 2 && !wcscmp(argv[1], L"-update-finish"))
 	{
@@ -237,6 +240,8 @@ int
 	{
 		if (!wcscmp(argv[I], L"-noupdate"))
 			UPDATES = 0;
+		else if (!wcscmp(argv[I], L"-updated"))
+			UPDATED = 1;
 		else if (!wcscmp(argv[I], L"-lang") && I + 1 < argc)
 			LANGUAGE = argv[++I];
 		else if (!wcscmp(argv[I], L"-words") && I + 1 < argc)
@@ -255,9 +260,9 @@ int
 			MODE = -1;
 	}
 
-	/* NOTHING BUT -words AND -noupdate: THE WINDOW */
+	/* NOTHING BUT -words, -noupdate AND -updated: THE WINDOW */
 	if (!SOURCE && !LANGUAGE && !DUMP && !CHECKS && MODE == CONVERT_AUTO)
-		return (UI_RUN(WORD_FILE, UPDATES));
+		return (UI_RUN(WORD_FILE, UPDATES, UPDATED));
 
 	if (!SOURCE || !RESULT || MODE < 0)
 	{

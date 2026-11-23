@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2026/11/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - GPL-3.0   :: Update - 2026/11/21 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - GPL-3.0   :: Update - 2026/11/23 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -1246,11 +1246,26 @@ void
 			Sleep(100); /* THE OLD ONE MAY STILL BE CLOSING */
 	}
 
-	/* THE NEW EXE, OR THE OLD ONE WHEN THE MOVE FAILED: BOTH ARE AT OLD NOW */
-	if (OPEN_AGAIN && START(OLD, L"", ARGUMENTS(), 0, &PI))
+	/*
+	# THE NEW EXE, OR THE OLD ONE WHEN THE MOVE FAILED: BOTH ARE AT OLD NOW.
+	# "-updated" WHEN IT REALLY IS THE NEW ONE. AFTER A FAILED MOVE THE OLD ONE
+	# OPENS WITH "-noupdate", OR IT WOULD FIND THE SAME UPDATE AND CLOSE AGAIN
+	# AND AGAIN. THE NEXT TIME IT IS OPENED IT TRIES ONCE MORE.
+	*/
+	if (OPEN_AGAIN)
 	{
-		CloseHandle(PI.hThread);
-		CloseHandle(PI.hProcess);
+		const WCHAR	*FLAG;
+
+		if (GONE)
+			FLAG = L"-updated";
+		else
+			FLAG = L"-noupdate";
+
+		if (START(OLD, FLAG, ARGUMENTS(), 0, &PI))
+		{
+			CloseHandle(PI.hThread);
+			CloseHandle(PI.hProcess);
+		}
 	}
 
 	free(OLD);

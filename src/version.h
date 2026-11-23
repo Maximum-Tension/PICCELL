@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2026/11/20 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - GPL-3.0   :: Update - 2026/11/21 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - GPL-3.0   :: Update - 2026/11/23 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -28,8 +28,8 @@
 #define PICCELL_VERSION_A 20
 #define PICCELL_VERSION_B 26
 #define PICCELL_VERSION_C 11
-#define PICCELL_VERSION_D 21
-#define PICCELL_VERSION_TEXT "20.26.11.21"
+#define PICCELL_VERSION_D 23
+#define PICCELL_VERSION_TEXT "20.26.11.23"
 /* THE FOUR NUMBERS FOR THE RESOURCE FILE (FILEVERSION, PRODUCTVERSION) */
 #define PICCELL_VERSION_LIST \
 	PICCELL_VERSION_A, PICCELL_VERSION_B, PICCELL_VERSION_C, PICCELL_VERSION_D

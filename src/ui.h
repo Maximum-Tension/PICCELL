@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2026/11/19 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - GPL-3.0   :: Update - 2026/11/21 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - GPL-3.0   :: Update - 2026/11/23 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -31,8 +31,9 @@
 
 /*
 # WORD_FILE: KNOWN WORDS, OR NULL. UPDATES: 0 = NO UPDATE CHECK (-NOUPDATE).
-# RETURNS THE EXIT CODE OF PICCELL.EXE.
+# UPDATED: 1 = THIS EXE JUST TOOK THE OLD ONE'S PLACE (-UPDATED), THE WINDOW
+# SAYS SO. RETURNS THE EXIT CODE OF PICCELL.EXE.
 */
-extern int	UI_RUN(const WCHAR *WORD_FILE, int UPDATES);
+extern int	UI_RUN(const WCHAR *WORD_FILE, int UPDATES, int UPDATED);
 
 #endif /* !UI_H */
